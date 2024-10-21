@@ -105,10 +105,10 @@ private extension HomeView {
                 .fontWeight(.semibold)
                 .foregroundStyle(.primaryText)
 
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading) {
                 HStack(spacing: 16) {
                     Image("visa")
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Overfør til konto")
                             .font(.headline)
                             .foregroundStyle(.primaryText)
@@ -130,7 +130,7 @@ private extension HomeView {
 
                 HStack(spacing: 16) {
                     Image("kasse")
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Overfør til kasse")
                             .font(.headline)
                             .foregroundStyle(.primaryText)
