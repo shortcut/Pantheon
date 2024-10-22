@@ -3,6 +3,9 @@ import SwiftUI
 struct HomeView: View {
     @State private var receipts = mockReceipts
     @State private var selectedReceipt: DepositReceipt?
+    @State private var showScanner: Bool = false
+    @State private var scannedCode: String?
+    @State private var shouldStartScanning: Bool = true
 
     var body: some View {
         VStack(spacing: 32) {
@@ -25,6 +28,28 @@ struct HomeView: View {
             paymentSheet(for: receipt)
             .presentationDetents([.medium])
         }
+        .fullScreenCover(isPresented: $showScanner) {
+            ZStack {
+                BarcodeScannerView(
+                    scannedCode: $scannedCode,
+                    shouldStartScanning: $shouldStartScanning,
+                    frameSize: .init(
+                        width: UIScreen.main.bounds.width,
+                        height: UIScreen.main.bounds.height
+                    )
+                )
+                .ignoresSafeArea(.all)
+
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(style: .init(lineWidth: 1))
+                    .foregroundStyle(.surfaceText)
+                    .frame(width: 150, height: 150)
+
+            }
+        }
+        .onChange(of: scannedCode) {
+            print(scannedCode)
+        }
     }
 }
 
@@ -41,7 +66,7 @@ private extension HomeView {
                     Spacer()
 
                     Button {
-
+                        showScanner = true
                     } label: {
                         Image(systemName: "qrcode.viewfinder")
                             .resizable()
