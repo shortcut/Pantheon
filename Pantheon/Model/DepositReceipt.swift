@@ -53,4 +53,8 @@ func generateRandomDateInRange() -> Date {
     return startDate.addingTimeInterval(randomTimeInterval)
 }
 
+func generateOneMockReceipt() -> DepositReceipt {
+    generateMockDepositReceipts()[0]
+}
+
  var mockReceipts = generateMockDepositReceipts()
