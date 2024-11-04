@@ -5,9 +5,11 @@ import Observation
 @Observable
 class ReceiptRepository {
     var receipts: [DepositReceipt] = []
+    var filteredReceipts: [DepositReceipt] = []
 
     init() {
         receipts = generateRandomReceipts()
+        filteredReceipts = receipts
     }
 }
 
@@ -17,6 +19,19 @@ extension ReceiptRepository {
         let receipt = generateMockReceipt()
         receipts[0].toggleState(.normal)
         receipts.insert(receipt, at: 0)
+    }
+
+    func filter(by state: DepositReceipt.State) {
+        switch state {
+        case .normal:
+            filteredReceipts = receipts
+        case .isNew:
+            filteredReceipts = receipts.filter { $0.state == .isNew }
+        case .expiresSoon:
+            filteredReceipts = receipts.filter { $0.state == .expiresSoon }
+        case .alreadyUsed:
+            filteredReceipts = receipts.filter { $0.state == .alreadyUsed }
+        }
     }
 }
 

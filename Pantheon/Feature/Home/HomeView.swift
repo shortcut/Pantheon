@@ -14,27 +14,49 @@ struct HomeView: View {
     @State private var shouldStartScanning: Bool = true
     @State private var showSuccess = false
     @State private var sheetType: SheetType = .transfer
+    @State private var showTransaferView: Bool = false
+    @State private var showPaymentSheet: Bool = false
+    @State private var filteredState: DepositReceipt.State = .normal
     var body: some View {
         VStack(spacing: 32) {
             headerView
             List {
-                Section("Tidligere pantelapper") {
-                    ForEach(receiptRepository.receipts) { receipt in
+                Section {
+                    ForEach(receiptRepository.filteredReceipts) { receipt in
                         ReceiptCell(receipt: receipt)
                             .onTapGesture {
                                 selectedReceipt = receipt
                             }
                             .listRowSeparator(.hidden)
                     }
+                } header: {
+                    Picker(selection: $filteredState) {
+                        ForEach(DepositReceipt.State.allCases) { state in
+                            Text(state.rawValue)
+                                .foregroundStyle(filteredState == state ? .surfaceText : .textBlue)
+                                .backgroundStyle(filteredState == state ? .primaryBackground :  .surfaceText)
+                                .tag(state)
+                        }
+                    } label: {
+                        Text("Filtrer etter status")
+                    }
+                    .pickerStyle(.segmented)
+
                 }
+
             }
             .listStyle(.plain)
             Spacer()
         }
-        .sheet(item: $selectedReceipt) { receipt in
-            paymentSheet(for: receipt)
-            .presentationDetents([.medium])
-        }
+        .sheet(isPresented: $showPaymentSheet, onDismiss: {
+            withAnimation {
+                selectedReceipt = nil
+                showTransaferView = true
+            }
+        }, content: {
+            paymentSheet(for: selectedReceipt!)
+                .presentationDetents([.medium])
+        })
         .sheet(isPresented: $showSuccess, onDismiss: {
             withAnimation(.bouncy) {
                 shouldStartScanning = true
@@ -43,6 +65,9 @@ struct HomeView: View {
         }, content: {
             BarcodeScanSuccessView(receipt: receiptRepository.receipts[0])
                 .presentationDetents([.medium])
+        })
+        .sheet(isPresented: $showTransaferView, content: {
+            TransferToAccountView()
         })
         .fullScreenCover(isPresented: $showScanner) {
             showSuccess = true
@@ -55,6 +80,18 @@ struct HomeView: View {
         .onChange(of: scannedCode) {
             if scannedCode != nil {
                 receiptRepository.addRandomReceipt()
+            }
+        }
+        .onChange(of: selectedReceipt) {
+            if selectedReceipt != nil {
+                withAnimation {
+                    showPaymentSheet.toggle()
+                }
+            }
+        }
+        .onChange(of: filteredState) {
+            withAnimation {
+                receiptRepository.filter(by: filteredState)
             }
         }
     }
@@ -100,27 +137,31 @@ private extension HomeView {
                 .foregroundStyle(.primaryText)
 
             VStack(alignment: .leading) {
-                HStack(spacing: 16) {
-                    Image("visa")
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Overfør til konto")
-                            .font(.headline)
-                            .foregroundStyle(.primaryText)
-                        Text("Overfør \(receipt.amount.formatted(.currency(code: "NOK"))) til din konto")
-                            .font(.caption)
-                            .foregroundStyle(.secondaryText)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                }
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .foregroundStyle(.white)
-                        .shadow(color: .shoppingListCellShadow,
-                                radius: 8, x: 2, y: 2)
-                )
-                .padding()
 
+                Button {
+                    showPaymentSheet.toggle()
+                } label: {
+                    HStack(spacing: 16) {
+                        Image("visa")
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Overfør til konto")
+                                .font(.headline)
+                                .foregroundStyle(.primaryText)
+                            Text("Overfør \(receipt.amount.formatted(.currency(code: "NOK"))) til din konto")
+                                .font(.caption)
+                                .foregroundStyle(.secondaryText)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .foregroundStyle(.white)
+                            .shadow(color: .shoppingListCellShadow,
+                                    radius: 8, x: 2, y: 2)
+                    )
+                    .padding()
+                }
 
                 HStack(spacing: 16) {
                     Image("kasse")
@@ -149,8 +190,4 @@ private extension HomeView {
         .padding(.top, 32)
         .padding()
     }
-}
-
-#Preview {
-    HomeView()
 }

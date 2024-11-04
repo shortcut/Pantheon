@@ -86,11 +86,11 @@
 				};
 			};
 			buildConfigurationList = AC9881132CC57B9100490175 /* Build configuration list for PBXProject "Pantheon" */;
-			developmentRegion = en;
+			developmentRegion = nb;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				nb,
 			);
 			mainGroup = AC98810F2CC57B9100490175;
 			minimizedProjectReferenceProxies = 1;
