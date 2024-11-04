@@ -44,7 +44,3 @@ struct BarcodeScanSuccessView: View {
         }
     }
 }
-
-#Preview {
-    BarcodeScanSuccessView(receipt: generateOneMockReceipt())
-}

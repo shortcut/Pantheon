@@ -6,22 +6,21 @@ enum SheetType: Hashable {
 }
 
 struct HomeView: View {
-    @State private var receipts = mockReceipts
+    @Environment(ReceiptRepository.self) private var receiptRepository
+
     @State private var selectedReceipt: DepositReceipt?
     @State private var showScanner: Bool = false
     @State private var scannedCode: String?
     @State private var shouldStartScanning: Bool = true
     @State private var showSuccess = false
     @State private var sheetType: SheetType = .transfer
-    private let mockReceipt = generateOneMockReceipt()
-
     var body: some View {
         VStack(spacing: 32) {
             headerView
             List {
                 Section("Tidligere pantelapper") {
-                    ForEach(receipts) { receipt in
-                        cell(for: receipt)
+                    ForEach(receiptRepository.receipts) { receipt in
+                        ReceiptCell(receipt: receipt)
                             .onTapGesture {
                                 selectedReceipt = receipt
                             }
@@ -38,12 +37,11 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showSuccess, onDismiss: {
             withAnimation(.bouncy) {
-                receipts.insert(mockReceipt, at: 0)
                 shouldStartScanning = true
                 scannedCode = nil
             }
         }, content: {
-            BarcodeScanSuccessView(receipt: mockReceipt)
+            BarcodeScanSuccessView(receipt: receiptRepository.receipts[0])
                 .presentationDetents([.medium])
         })
         .fullScreenCover(isPresented: $showScanner) {
@@ -54,7 +52,11 @@ struct HomeView: View {
                 shouldStartScanning: $shouldStartScanning
             )
         }
-
+        .onChange(of: scannedCode) {
+            if scannedCode != nil {
+                receiptRepository.addRandomReceipt()
+            }
+        }
     }
 }
 
@@ -87,44 +89,6 @@ private extension HomeView {
             .background(.primaryBackground)
 
         }
-    }
-
-    @ViewBuilder
-    func cell(for item: DepositReceipt) -> some View {
-        HStack {
-            Image("receipt")
-                .padding(8)
-                .background(
-                    RoundedRectangle(cornerRadius: 4)
-                        .stroke(lineWidth: 1)
-                        .foregroundStyle(.secondaryText)
-
-                )
-
-            VStack(alignment: .leading) {
-                Text(item.store)
-                    .font(.headline)
-                    .foregroundStyle(.primaryText)
-
-                Text(item.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.caption)
-                    .foregroundStyle(.secondaryText)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            Text(item.amount.formatted(.currency(code: "NOK")))
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .fontDesign(.monospaced)
-                .foregroundStyle(.primaryText)
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .foregroundStyle(.white)
-                .shadow(color: .shoppingListCellShadow,
-                        radius: 8, x: 2, y: 2)
-        )
-        .padding()
     }
 
     @ViewBuilder
