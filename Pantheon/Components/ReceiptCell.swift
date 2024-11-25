@@ -66,15 +66,19 @@ struct ReceiptCell: View {
             .padding(.horizontal)
 
             if receipt.state != .normal {
-                Text(tagTitle)
-                    .font(.caption).bold()
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 2)
-                    .background(tagBackgroundColor)
-                    .foregroundStyle(.white)
-                    .clipShape(Capsule())
-                    .frame(alignment: .topLeading)
-                    .offset(x: -12)
+//                Text(tagTitle)
+//                    .font(.caption).bold()
+//                    .padding(.horizontal, 4)
+//                    .padding(.vertical, 2)
+//                    .background(tagBackgroundColor)
+//                    .foregroundStyle(.white)
+//                    .clipShape(Capsule())
+//                    .frame(alignment: .topLeading)
+//                    .offset(x: -12)
+                Circle()
+                    .fill(tagBackgroundColor)
+                    .frame(width: 12)
+                    .offset(x: -12, y: -4)
             }
         }
     }
