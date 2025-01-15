@@ -1,13 +1,41 @@
 import Foundation
+import DesignSystem
 
 struct DepositReceipt: Identifiable, Codable, Equatable {
-    enum State: String , Codable, CaseIterable, Identifiable {
-        case normal = "Alle"
-        case isNew = "Ny"
-        case expiresSoon = "Utgår snart"
-        case alreadyUsed = "Brukte"
+    enum State: Int , Codable, CaseIterable, Identifiable {
+        case normal
+        case isNew
+        case expiresSoon
+        case alreadyUsed
+        
+        var title: String {
+            switch self {
+            case .normal: return "Alle"
+            case .isNew: return "Ny"
+            case .expiresSoon: return "Utgår"
+            case .alreadyUsed: return "Brukte"
+            }
+        }
+        
+        var tagTitle: String {
+            switch self {
+            case .normal: return ""
+            case .isNew: return "Ny"
+            case .expiresSoon: return "Utgår"
+            case .alreadyUsed: return "Brukt"
+            }
+        }
+        
+        func tagBackgroundColor(with dsColors: DesignSystemColorProtocol) -> DSColor {
+            switch self {
+            case .expiresSoon: return dsColors.surfaceNotificationDefault
+            case .isNew: return dsColors.surfaceSuccessSubtle
+            case .normal: return dsColors.textInvertedDefault
+            case .alreadyUsed: return dsColors.surfaceActionDefault
+            }
+        }
 
-        var id: String { self.rawValue }
+        var id: Int { self.rawValue }
     }
 
     let id: String

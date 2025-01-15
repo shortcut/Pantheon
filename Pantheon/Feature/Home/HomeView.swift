@@ -1,4 +1,5 @@
 import SwiftUI
+import DesignSystem
 
 enum SheetType: Identifiable {
     case payment(DepositReceipt)
@@ -34,53 +35,61 @@ enum FullScreenCoverType: Identifiable {
 
 struct HomeView: View {
     @Environment(ReceiptRepository.self) private var receiptRepository
+    @Environment(\.designSystemFonts) fileprivate var dsFonts
+    @Environment(\.designSystemColors) fileprivate var dsColors
+    @Environment(\.designSystemIcons) fileprivate var dsIcons
+    @Environment(\.designSystemSpacing) fileprivate var dsSpacing
 
     @State private var selectedReceipt: DepositReceipt?
     @State private var scannedCode: String?
     @State private var shouldStartScanning: Bool = true
-    @State private var filteredState: DepositReceipt.State = .normal
+    @State private var filteredState: Int = 0
 
     @State private var activeSheet: SheetType?
     @State private var activeFullScreenCover: FullScreenCoverType?
 
     var body: some View {
-        VStack(spacing: 32) {
-            headerView
+        NavigationView {
             List {
-                Section {
-                    ForEach(receiptRepository.filteredReceipts) { receipt in
-                        ReceiptCell(receipt: receipt)
-                            .onTapGesture {
-                                selectedReceipt = receipt
-                            }
-                            .listRowSeparator(.hidden)
-                    }
-                } header: {
-                    Picker(selection: $filteredState) {
-                        ForEach(DepositReceipt.State.allCases) { state in
-                            Text(state.rawValue)
-                                .foregroundStyle(filteredState == state ? .surfaceText : .textBlue)
-                                .backgroundStyle(filteredState == state ? .primaryBackground :  .surfaceText)
-                                .tag(state)
-                        }
+                ForEach(receiptRepository.filteredReceipts) { receipt in
+                    Button{
+                        selectedReceipt = receipt
                     } label: {
-                        Text("Filtrer etter status")
+                        ReceiptCell(receipt: receipt)
                     }
-                    .pickerStyle(.segmented)
-
+                    .buttonStyle(.listItemButton)
                 }
-
             }
-            .listStyle(.plain)
-            Spacer()
+            .listStyle(.insetGrouped)
+            .defaultListBackground()
+            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle("Pantelapper")
+            .toolbar(content: {
+                ToolbarItem(placement: .status) {
+                    SegmentedControl(selection: $filteredState, options: DepositReceipt.State.allCases.map{$0.title})
+                }
+            })
+            .toolbar(content: {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button {
+                        activeFullScreenCover = .scanner
+                    } label: {
+                        Image(ds: dsIcons.utilityScannerBarCode)
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                    }
+                }
+            })
         }
+        .defaultStyles()
         .sheet(item: $activeSheet, onDismiss: {
             selectedReceipt = nil
         }) { sheet in
             switch sheet {
             case .payment(let receipt):
                 paymentSheet(for: receipt)
-                    .presentationDetents([.medium])
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
             case .transferToAccount:
                 TransferToAccountView()
             case .transfertoTrip:
@@ -99,24 +108,30 @@ struct HomeView: View {
                 )
             }
         }
-        .onChange(of: scannedCode) { _ in
-            if let code = scannedCode {
-                receiptRepository.addRandomReceipt()
-                if let newReceipt = receiptRepository.receipts.first {
-                    activeSheet = .scanSuccess(newReceipt)
-                }
-                scannedCode = nil
-                activeFullScreenCover = nil
+        .onChange(of: scannedCode) {
+            guard scannedCode != nil else {
+                return
             }
+            
+            receiptRepository.addRandomReceipt()
+            
+            guard let newReceipt = receiptRepository.receipts.first else {
+                return
+            }
+            
+            activeSheet = .scanSuccess(newReceipt)
+            scannedCode = nil
+            activeFullScreenCover = nil
         }
-        .onChange(of: selectedReceipt) { receipt in
-            if let receipt = receipt {
+        .onChange(of: selectedReceipt) { _, newValue in
+            if let receipt = newValue {
                 withAnimation {
                     activeSheet = .payment(receipt)
                 }
             }
         }
-        .onChange(of: filteredState) { newState in
+        .onChange(of: filteredState) {
+            let newState = DepositReceipt.State(rawValue: filteredState) ?? .normal
             withAnimation {
                 receiptRepository.filter(by: newState)
             }
@@ -126,64 +141,34 @@ struct HomeView: View {
 
 // MARK: - Components
 private extension HomeView {
-    @ViewBuilder
-    var headerView: some View {
-        VStack {
-            VStack(alignment: .leading) {
-                HStack(alignment: .center) {
-                    Text("Pantelapper")
-                        .font(.title)
-                        .foregroundStyle(.surfaceText)
-                    Spacer()
-
-                    Button {
-                        activeFullScreenCover = .scanner
-                    } label: {
-                        Image(systemName: "qrcode.viewfinder")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 32)
-                    }
-                    .foregroundStyle(.surfaceText)
-                }
-                .padding()
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 100)
-            .background(.primaryBackground)
-        }
-    }
 
     @ViewBuilder
     func paymentSheet(for receipt: DepositReceipt) -> some View {
-        VStack(spacing: 32) {
+        VStack(spacing: dsSpacing.spaceXL) {
             Text("Hva vil du gjøre med pengene?")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundStyle(.primaryText)
+                .font(.ds(dsFonts.header1Heading))
+                .foregroundStyle(dsColors.textDefault)
 
             VStack(alignment: .leading) {
                 Button {
                     activeSheet = .transferToAccount
                 } label: {
-                    HStack(spacing: 16) {
+                    HStack(spacing: dsSpacing.spaceMD) {
                         Image("visa")
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
                             Text("Overfør til konto")
-                                .font(.headline)
-                                .foregroundStyle(.primaryText)
-                            Text("Overfør \(receipt.amount.formatted(.currency(code: "NOK"))) til din konto")
-                                .font(.caption)
-                                .foregroundStyle(.secondaryText)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .font(.ds(dsFonts.header2Heading))
+                                .foregroundStyle(dsColors.textDefault)
+                            Text("Overfør \(amount: receipt.amount) til din konto")
+                                .font(.ds(dsFonts.caption))
+                                .foregroundStyle(dsColors.textSubtle)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .foregroundStyle(.white)
-                            .shadow(color: .shoppingListCellShadow,
-                                    radius: 8, x: 2, y: 2)
+                        RoundedRectangle(cornerRadius: 12)
+                            .foregroundStyle(dsColors.surfacePrimary)
                     )
                     .padding()
                 }
@@ -191,24 +176,22 @@ private extension HomeView {
                 Button {
                     activeSheet = .transfertoTrip
                 } label: {
-                    HStack(spacing: 16) {
+                    HStack(spacing: dsSpacing.spaceMD) {
                         Image("kasse")
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
                             Text("Overfør til kasse")
-                                .font(.headline)
-                                .foregroundStyle(.primaryText)
-                            Text("Overfør \(receipt.amount.formatted(.currency(code: "NOK"))) til din neste handel")
-                                .font(.caption)
-                                .foregroundStyle(.secondaryText)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .font(.ds(dsFonts.header2Heading))
+                                .foregroundStyle(dsColors.textDefault)
+                            Text("Overfør \(amount: receipt.amount) til din neste handel")
+                                .font(.ds(dsFonts.caption))
+                                .foregroundStyle(dsColors.textSubtle)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .foregroundStyle(.white)
-                            .shadow(color: .shoppingListCellShadow,
-                                    radius: 8, x: 2, y: 2)
+                        RoundedRectangle(cornerRadius: 12)
+                            .foregroundStyle(dsColors.surfacePrimary)
                     )
                     .padding()
                 }
@@ -216,7 +199,8 @@ private extension HomeView {
 
             Spacer()
         }
-        .padding(.top, 32)
+        .padding(.top, dsSpacing.spaceXL)
         .padding()
+        .background(dsColors.surfaceSubtle1)
     }
 }

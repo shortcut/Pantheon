@@ -1,85 +1,44 @@
 import SwiftUI
 
 struct ReceiptCell: View {
+    @Environment(\.designSystemFonts) fileprivate var dsFonts
+    @Environment(\.designSystemColors) fileprivate var dsColors
+    @Environment(\.designSystemIcons) fileprivate var dsIcons
+    @Environment(\.designSystemIllustrations) private var dsIllustrations
     let receipt: DepositReceipt
-
-    var tagTitle: String {
-        switch receipt.state {
-        case .isNew:
-            return "Ny"
-        case .expiresSoon:
-            return "Utgår snart"
-        case .normal:
-            return ""
-        case .alreadyUsed:
-            return "Brukt"
-        }
-    }
-
-    var tagBackgroundColor: Color {
-        switch receipt.state {
-        case .expiresSoon: return .red
-        case .isNew: return .green
-        case .normal: return .white
-        case .alreadyUsed: return .primaryBackground
-        }
-    }
-
+    
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            HStack {
-                Image("receipt")
-                    .padding(8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(lineWidth: 1)
-                            .foregroundStyle(.secondaryText)
-
-                    )
-
-                VStack(alignment: .leading) {
-                    Text(receipt.store)
-                        .font(.headline)
-                        .foregroundStyle(.primaryText)
-
-                    Text(receipt.date.formatted(date: .abbreviated, time: .omitted))
-                        .font(.caption)
-                        .foregroundStyle(.secondaryText)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                VStack {
-                    Text(receipt.amount.formatted(.currency(code: "NOK")))
-                        .font(.body)
-                        .fontWeight(.semibold)
-                        .fontDesign(.monospaced)
-                        .foregroundStyle(.primaryText)
-
-                }
+        HStack {
+            Image(ds: dsIllustrations.receipt)
+                .resizable()
+                .frame(width: 64, height: 64)
+            
+            VStack(alignment: .leading) {
+                Text(receipt.store)
+                    .font(.ds(dsFonts.header2Heading))
+                    .foregroundStyle(.primaryText)
+                
+                Text("\(purchaseDate: receipt.date)")
+                    .font(.ds(dsFonts.bodySmall))
+                    .foregroundStyle(.secondaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 8)
+            VStack(alignment: .trailing) {
+                Text(receipt.state.tagTitle)
+                    .font(.ds(dsFonts.captionBold))
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 2)
+                    .background(receipt.state.tagBackgroundColor(with: dsColors))
                     .foregroundStyle(.white)
-                    .shadow(color: .shoppingListCellShadow,
-                            radius: 8, x: 2, y: 2)
-            )
-            .padding(.horizontal)
-
-            if receipt.state != .normal {
-//                Text(tagTitle)
-//                    .font(.caption).bold()
-//                    .padding(.horizontal, 4)
-//                    .padding(.vertical, 2)
-//                    .background(tagBackgroundColor)
-//                    .foregroundStyle(.white)
-//                    .clipShape(Capsule())
-//                    .frame(alignment: .topLeading)
-//                    .offset(x: -12)
-                Circle()
-                    .fill(tagBackgroundColor)
-                    .frame(width: 12)
-                    .offset(x: -12, y: -4)
+                    .clipShape(Capsule())
+                Text("\(amount: receipt.amount)")
             }
         }
+        .padding(8)
+//        .overlay(alignment: .topTrailing) {
+//            Circle()
+//                .fill(tagBackgroundColor)
+//                .frame(width: 12)
+//        }
     }
 }

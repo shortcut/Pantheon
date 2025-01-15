@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4BD19B1B2D143B3E0086F261 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 4BD19B1A2D143B3E0086F261 /* DesignSystem */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		AC9881182CC57B9100490175 /* Pantheon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pantheon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BD19B1B2D143B3E0086F261 /* DesignSystem in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = Pantheon;
 			packageProductDependencies = (
+				4BD19B1A2D143B3E0086F261 /* DesignSystem */,
 			);
 			productName = Pantheon;
 			productReference = AC9881182CC57B9100490175 /* Pantheon.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = AC98810F2CC57B9100490175;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4BD19B192D143B3E0086F261 /* XCRemoteSwiftPackageReference "Rema-1000-DesignSystem-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AC9881192CC57B9100490175 /* Products */;
 			projectDirPath = "";
@@ -326,6 +335,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4BD19B192D143B3E0086F261 /* XCRemoteSwiftPackageReference "Rema-1000-DesignSystem-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/shortcut-nda/Rema-1000-DesignSystem-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4BD19B1A2D143B3E0086F261 /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4BD19B192D143B3E0086F261 /* XCRemoteSwiftPackageReference "Rema-1000-DesignSystem-iOS" */;
+			productName = DesignSystem;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AC9881102CC57B9100490175 /* Project object */;
 }

@@ -2,18 +2,20 @@ import SwiftUI
 
 struct BarcodeScanSuccessView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.designSystemFonts) private var dsFonts
+    @Environment(\.designSystemColors) private var dsColors
+    @Environment(\.designSystemIllustrations) private var dsIllustrations
 
     let receipt: DepositReceipt
 
     var body: some View {
         VStack(spacing: 16) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.largeTitle)
-                .foregroundStyle(.green)
+            Image(ds: dsIllustrations.barcode)
+                .resizable()
+                .frame(width: 128, height: 128)
             Text("Pantelapp registrert")
-                .font(.title2)
-                .fontWeight(.semibold)
-                .foregroundStyle(.primaryText)
+                .font(.ds(dsFonts.header1Heading))
+                .foregroundStyle(dsColors.textDefault)
 
             VStack {
                 Group {
@@ -31,16 +33,10 @@ struct BarcodeScanSuccessView: View {
                 dismiss()
             } label: {
                 Text("OK".uppercased())
-                    .font(.headline).bold()
-                    .foregroundStyle(.surfaceText)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(.primaryBackground)
-                    .cornerRadius(8)
-                    .padding()
-
             }
-            .padding(.top)
+            .buttonStyle(.actionButtonPrimary)
+            .actionButtonIsExpandingWidth(true)
+            .padding()
         }
     }
 }
