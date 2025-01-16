@@ -2,10 +2,9 @@ import SwiftUI
 import Observation
 
 
-@Observable
-class ReceiptRepository {
-    var receipts: [DepositReceipt] = []
-    var filteredReceipts: [DepositReceipt] = []
+class ReceiptRepository: ObservableObject {
+    @Published var receipts: [DepositReceipt] = []
+    @Published var filteredReceipts: [DepositReceipt] = []
 
     init() {
         receipts = generateRandomReceipts()

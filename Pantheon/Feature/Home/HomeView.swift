@@ -34,10 +34,12 @@ enum FullScreenCoverType: Identifiable {
 }
 
 struct HomeView: View {
-    @Environment(ReceiptRepository.self) private var receiptRepository
+    @EnvironmentObject var receiptRepository: ReceiptRepository
+    
     @Environment(\.designSystemFonts) fileprivate var dsFonts
     @Environment(\.designSystemColors) fileprivate var dsColors
     @Environment(\.designSystemIcons) fileprivate var dsIcons
+    @Environment(\.designSystemSizing) fileprivate var dsSizing
     @Environment(\.designSystemSpacing) fileprivate var dsSpacing
 
     @State private var selectedReceipt: DepositReceipt?
@@ -76,7 +78,7 @@ struct HomeView: View {
                     } label: {
                         Image(ds: dsIcons.utilityScannerBarCode)
                             .resizable()
-                            .frame(width: 40, height: 40)
+                            .frame(width: dsSizing.size2XL, height: dsSizing.size2XL)
                     }
                 }
             })
@@ -87,16 +89,24 @@ struct HomeView: View {
         }) { sheet in
             switch sheet {
             case .payment(let receipt):
-                paymentSheet(for: receipt)
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
+                if #available(iOS 16.0, *) {
+                    paymentSheet(for: receipt)
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                } else {
+                    paymentSheet(for: receipt)
+                }
             case .transferToAccount:
                 TransferToAccountView()
             case .transfertoTrip:
                 TransferToShoppingView()
             case .scanSuccess(let receipt):
-                BarcodeScanSuccessView(receipt: receipt)
-                    .presentationDetents([.medium])
+                if #available(iOS 16.0, *) {
+                    BarcodeScanSuccessView(receipt: receipt)
+                        .presentationDetents([.medium])
+                } else {
+                    BarcodeScanSuccessView(receipt: receipt)
+                }
             }
         }
         .fullScreenCover(item: $activeFullScreenCover) { cover in
@@ -108,8 +118,8 @@ struct HomeView: View {
                 )
             }
         }
-        .onChange(of: scannedCode) {
-            guard scannedCode != nil else {
+        .onChange(of: scannedCode) { newValue in
+            guard newValue != nil else {
                 return
             }
             
@@ -123,15 +133,15 @@ struct HomeView: View {
             scannedCode = nil
             activeFullScreenCover = nil
         }
-        .onChange(of: selectedReceipt) { _, newValue in
+        .onChange(of: selectedReceipt) { newValue in
             if let receipt = newValue {
                 withAnimation {
                     activeSheet = .payment(receipt)
                 }
             }
         }
-        .onChange(of: filteredState) {
-            let newState = DepositReceipt.State(rawValue: filteredState) ?? .normal
+        .onChange(of: filteredState) { newValue in
+            let newState = DepositReceipt.State(rawValue: newValue) ?? .normal
             withAnimation {
                 receiptRepository.filter(by: newState)
             }
@@ -167,7 +177,7 @@ private extension HomeView {
                     }
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: dsSizing.sizeSM)
                             .foregroundStyle(dsColors.surfacePrimary)
                     )
                     .padding()
@@ -190,7 +200,7 @@ private extension HomeView {
                     }
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: dsSizing.sizeSM)
                             .foregroundStyle(dsColors.surfacePrimary)
                     )
                     .padding()

@@ -3,7 +3,7 @@ import SwiftUI
 
 struct TransferToAccountView: View {
     @Environment(\.dismiss) var dismiss
-    @Environment(ReceiptRepository.self) var repository
+    @EnvironmentObject var repository: ReceiptRepository
     var body: some View {
         VStack(spacing: 16) {
             Text(repository.receipts[0].store)
