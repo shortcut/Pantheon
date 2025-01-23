@@ -13,7 +13,6 @@ extension Date {
             return Date()
         }
 
-        let timeInterval = Date().timeIntervalSince(startDate)
         let randomTimeInterval = TimeInterval.random(in: 0...(endDate.timeIntervalSince(startDate)))
 
         return startDate.addingTimeInterval(randomTimeInterval)

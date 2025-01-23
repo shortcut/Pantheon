@@ -2,52 +2,65 @@ import SwiftUI
 
 struct TransferToShoppingView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.designSystemFonts) private var dsFonts
+    @Environment(\.designSystemColors) private var dsColors
+    @Environment(\.designSystemIcons) private var dsIcons
+    @Environment(\.designSystemSizing) private var dsSizing
+    @Environment(\.designSystemSpacing) private var dsSpacing
 
     var body: some View {
         VStack {
             Spacer()
+
             VStack {
                 Text("Skann strekkoden ved kassen.")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primaryBackground)
+                    .font(.ds(dsFonts.header2Heading))
+                    .foregroundStyle(Color(ds: dsColors.textDefault))
+
                 Image(.barcode)
                     .resizable()
                     .renderingMode(.template)
                     .aspectRatio(contentMode: .fill)
-                    .foregroundStyle(.primaryText)
-                    .frame(height: 100)
+                    .foregroundStyle(Color(ds: dsColors.textStrong))
+                    .frame(height: dsSizing.size4XL)
             }
-            .padding()
+            .padding(dsSpacing.spaceMD)
             .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(.white)
-                    .shadow(color: .shoppingListCellShadow,
-                            radius: 8, x: 2, y: 2)
+                RoundedRectangle(cornerRadius: dsSizing.sizeXS)
+                    .fill(Color(ds: dsColors.surfacePrimary))
             )
-            .padding(24)
+            .padding(dsSpacing.spaceLG)
+
             Spacer()
         }
+        .background(dsColors.surfaceSubtle1)
         .safeAreaInset(edge: .bottom) {
             Button {
                 dismiss()
             } label: {
                 Text("Ferdig")
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
-                    .frame(height: 48)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(.primaryBackground)
-                    )
-                    .padding()
             }
-
+            .buttonStyle(.actionButtonPrimary)
+            .actionButtonIsExpandingWidth(true)
+            .padding(dsSpacing.spaceLG)
+        }
+        .overlay(alignment: .topTrailing) {
+            closeButton()
         }
     }
-}
 
+    private func closeButton() -> some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(ds: dsIcons.actionsClose)
+                .resizable()
+                .foregroundStyle(dsColors.textDefault)
+                .frame(width: dsSizing.size2XL, height: dsSizing.size2XL)
+        }
+        .padding()
+    }
+}
 
 #Preview {
     TransferToShoppingView()

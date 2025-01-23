@@ -5,29 +5,42 @@ struct BarcodeScanSuccessView: View {
     @Environment(\.designSystemFonts) private var dsFonts
     @Environment(\.designSystemColors) private var dsColors
     @Environment(\.designSystemIllustrations) private var dsIllustrations
+    @Environment(\.designSystemSpacing) private var dsSpacing
 
     let receipt: DepositReceipt
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: dsSpacing.spaceMD) {
             Image(ds: dsIllustrations.barcode)
                 .resizable()
                 .frame(width: 128, height: 128)
+                .padding(.top, dsSpacing.spaceXL)
+
             Text("Pantelapp registrert")
                 .font(.ds(dsFonts.header1Heading))
-                .foregroundStyle(dsColors.textDefault)
+                .foregroundStyle(Color(ds: dsColors.textDefault))
 
-            VStack {
-                Group {
-                    Text("Du har scannet en pantelapp på verdi:")
-                    Text(" \(receipt.amount.formatted(.currency(code: "NOK")))")
-                        .fontWeight(.bold)
-                    Text("hos")
-                    Text(" \(receipt.store.uppercased())")
-                        .fontWeight(.bold)
-                }
-                .foregroundStyle(.secondaryText)
+            VStack(spacing: dsSpacing.spaceXS) {
+                Text("Du har scannet en pantelapp på verdi:")
+                    .font(.ds(dsFonts.bodySmall))
+                    .foregroundStyle(Color(ds: dsColors.textSubtle))
+
+                Text("\(amount: receipt.amount)")
+                    .font(.ds(dsFonts.bodyMedium))
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color(ds: dsColors.textStrong))
+
+                Text("hos")
+                    .font(.ds(dsFonts.bodySmall))
+                    .foregroundStyle(Color(ds: dsColors.textSubtle))
+
+                Text(receipt.store.uppercased())
+                    .font(.ds(dsFonts.bodyMedium))
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color(ds: dsColors.textStrong))
             }
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, dsSpacing.spaceLG)
 
             Button {
                 dismiss()
@@ -36,7 +49,9 @@ struct BarcodeScanSuccessView: View {
             }
             .buttonStyle(.actionButtonPrimary)
             .actionButtonIsExpandingWidth(true)
-            .padding()
+            .padding(.top, dsSpacing.spaceLG)
+            .padding(.bottom, dsSpacing.spaceXL)
         }
+        .padding(.horizontal, dsSpacing.spaceLG)
     }
 }

@@ -83,8 +83,8 @@ struct CornerStrokeOverlay: View {
     
     private let rectWidth: CGFloat = 232
     private let rectHeight: CGFloat = 232
-    private let strokeWidth: CGFloat = 3
-    
+    private let strokeWidth: CGFloat = DesignSystem.default.sizing.size2XS
+
     let strokeColor: Color
     
     var body: some View {

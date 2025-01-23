@@ -2,92 +2,100 @@
 import SwiftUI
 
 struct TransferToAccountView: View {
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var repository: ReceiptRepository
-    var body: some View {
-        VStack(spacing: 16) {
-            Text(repository.receipts[0].store)
-                .font(.title3)
-                .fontWeight(.medium)
-                .foregroundStyle(.textBlue)
-                .padding(.top, 24)
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.designSystemFonts) private var dsFonts
+    @Environment(\.designSystemColors) private var dsColors
+    @Environment(\.designSystemIcons) private var dsIcons
+    @Environment(\.designSystemSizing) private var dsSizing
+    @Environment(\.designSystemSpacing) private var dsSpacing
 
-            VStack(alignment: .leading, spacing: 8) {
+    @EnvironmentObject var repository: ReceiptRepository
+
+    var body: some View {
+        let receipt = repository.receipts[0]
+
+        VStack(spacing: dsSpacing.spaceMD) {
+
+            Text(receipt.store)
+                .font(.ds(dsFonts.header3Subheading))
+                .foregroundStyle(Color(ds: dsColors.textActionDefault))
+                .padding(.top, dsSpacing.spaceLG)
+
+
+            VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
                 Text("Til overføring")
-                    .foregroundStyle(.textBlue)
-                Text(repository.receipts[0].amount, format: .currency(code: "NOK"))
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.primaryBackground)
+                    .font(.ds(dsFonts.bodySmall))
+                    .foregroundStyle(Color(ds: dsColors.textSubtle))
+
+                Text("\(amount: receipt.amount)")
+                    .font(.ds(dsFonts.header1DisplayLarge))
+                    .foregroundStyle(Color(ds: dsColors.textStrong))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(24)
+            .padding(dsSpacing.spaceLG)
             .background {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(.white)
+                RoundedRectangle(cornerRadius: dsSizing.sizeMD, style: .continuous)
+                    .fill(Color(ds: dsColors.surfaceDefaultMain))
                     .background(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke()
-                            .fill(.lightBorder)
+                        RoundedRectangle(cornerRadius: dsSizing.sizeMD, style: .continuous)
+                            .stroke(Color(ds: dsColors.borderDividerDefault))
                     )
-                    .shadow(color: .lightBorder.opacity(0.4), radius: 10)
+                    .shadow(color: Color(ds: dsColors.borderDividerDefault).opacity(0.4), radius: 10)
             }
-            .padding(.top, 32)
+            .padding(.top, dsSpacing.spaceXL)
 
-            HStack(spacing: 16) {
+            HStack(spacing: dsSpacing.spaceMD) {
                 Image(.sbanken)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 48, height: 48)
-                VStack(alignment: .leading, spacing: 6) {
+                    .frame(width: dsSizing.sizeXL, height: dsSizing.sizeXL)
+
+                VStack(alignment: .leading, spacing: dsSpacing.space2XS) {
                     Text("Sbanken ASA")
-                        .fontWeight(.light)
-                        .foregroundStyle(.textBlue)
+                        .font(.ds(dsFonts.bodySmall))
+                        .foregroundStyle(Color(ds: dsColors.textActionDefault))
+
                     Text("Kort som ender med 1234")
-                        .font(.caption)
-                        .foregroundStyle(.secondaryText)
+                        .font(.ds(dsFonts.caption))
+                        .foregroundStyle(Color(ds: dsColors.textSubtle))
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 Button {
-
+                    // Action to change account
                 } label: {
                     Text("Endre")
-                        .fontWeight(.bold)
+                        .font(.ds(dsFonts.buttonSmall))
+                        .foregroundStyle(Color(ds: dsColors.textActionDefault))
                 }
-
             }
-            .padding(24)
+            .padding(dsSpacing.spaceLG)
             .background {
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(.white)
+                RoundedRectangle(cornerRadius: dsSizing.sizeMD, style: .continuous)
+                    .fill(Color(ds: dsColors.surfaceDefaultMain))
                     .background(
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke()
-                            .fill(.lightBorder)
+                        RoundedRectangle(cornerRadius: dsSizing.sizeMD, style: .continuous)
+                            .stroke(Color(ds: dsColors.borderDividerDefault))
                     )
-                    .shadow(color: .lightBorder.opacity(0.4), radius: 10)
+                    .shadow(color: Color(ds: dsColors.borderDividerDefault).opacity(0.4), radius: 10)
             }
 
             Spacer()
         }
-        .padding(.horizontal, 24)
+        .padding(.horizontal, dsSpacing.spaceLG)
         .safeAreaInset(edge: .bottom) {
             Button {
                 dismiss()
             } label: {
                 Text("Bekreft")
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .foregroundStyle(.surfaceText)
-                    .background(.primaryBackground)
-                    .cornerRadius(8)
             }
-            .padding(24)
+            .buttonStyle(.actionButtonPrimary)
+            .actionButtonIsExpandingWidth(true)
+            .padding(dsSpacing.spaceLG)
         }
     }
 }
+
 
 #Preview {
     TransferToAccountView()
