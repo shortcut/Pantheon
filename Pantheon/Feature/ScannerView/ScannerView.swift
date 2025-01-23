@@ -7,123 +7,110 @@ struct ScannerView: View {
     @Environment(\.designSystemColors) fileprivate var dsColors
     @Environment(\.designSystemSizing) fileprivate var dsSizing
     @Environment(\.designSystemSpacing) fileprivate var dsSpacing
-
+    
     @Binding var scannedCode: String?
     @Binding var shouldStartScanning: Bool
     
     var body: some View {
         ZStack {
-            BarcodeScannerView(
-                scannedCode: $scannedCode,
-                shouldStartScanning: $shouldStartScanning,
-                frameSize: .init(
-                    width: UIScreen.main.bounds.width,
-                    height: UIScreen.main.bounds.height
-                )
-            )
-            .ignoresSafeArea(.all)
-            // Black overlay with transparency
-            Color.black.opacity(0.3)
-                .ignoresSafeArea(.all)
-                .mask(
-                    RoundedRectangleMask()
-                )
+            barcodeScannerView()
             
-            CornerStrokeOverlay()
+            overlayMask()
+            
+            CornerStrokeOverlay(
+                strokeColor: Color(ds:dsColors.surfaceSubtle2)
+            )
         }
         .ignoresSafeArea(.all)
         .onChange(of: scannedCode) { newValue in
             guard newValue != nil else { return }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                dismiss()
-            }
+            dismiss()
         }
-        .overlay(alignment: .topTrailing) {
-            Button {
-                dismiss()
-            } label: {
-                Image(ds: dsIcons.actionsClose)
-                    .resizable()
-                    .foregroundStyle(dsColors.iconInvertedDefault)
-                    .frame(width: dsSizing.size2XL, height: dsSizing.size2XL)
-            }
-            .padding()
+        .overlay(alignment: .topTrailing) { closeButton() }
+    }
+    
+    private func barcodeScannerView() -> some View {
+        BarcodeScannerView(
+            scannedCode: $scannedCode,
+            shouldStartScanning: $shouldStartScanning,
+            frameSize: .init(
+                width: UIScreen.main.bounds.width,
+                height: UIScreen.main.bounds.height
+            )
+        )
+        .ignoresSafeArea(.all)
+    }
+    
+    private func overlayMask() -> some View {
+        Color(ds: dsColors.surfaceStrongStatic)
+            .opacity(0.3)
+            .ignoresSafeArea(.all)
+            .mask(RoundedRectangleMask())
+    }
+    
+    private func closeButton() -> some View {
+        Button {
+            dismiss()
+        } label: {
+            Image(ds: dsIcons.actionsClose)
+                .resizable()
+                .foregroundStyle(dsColors.iconInvertedDefault)
+                .frame(width: dsSizing.size2XL, height: dsSizing.size2XL)
         }
+        .padding()
     }
 }
 
 struct RoundedRectangleMask: View {
+    @Environment(\.designSystemSizing) fileprivate var dsSizing
+    
     var body: some View {
         ZStack {
-            // Full screen black background
             Color.black
             
-            // Rounded rectangle cutout
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: dsSizing.sizeMD)
                 .frame(width: 200, height: 200)
-                .blendMode(.destinationOut) // This makes the rectangle transparent
+                .blendMode(.destinationOut)
         }
-        .compositingGroup() // Required for the blendMode to work properly
+        .compositingGroup()
     }
 }
 
 // MARK: - Custom Corner Stroke Overlay
 struct CornerStrokeOverlay: View {
+    @Environment(\.designSystemSizing) fileprivate var dsSizing
+    
+    private let rectWidth: CGFloat = 232
+    private let rectHeight: CGFloat = 232
+    private let strokeWidth: CGFloat = 3
+    
+    let strokeColor: Color
+    
     var body: some View {
         GeometryReader { geometry in
-            let rectWidth: CGFloat = 232
-            let rectHeight: CGFloat = 232
-            let cornerRadius: CGFloat = 20
-            let strokeWidth: CGFloat = 3
-            
             ZStack {
-                let strokeColor = Color.white
-                
-                // Top Left Corner
-                Path { path in
-                    path.addArc(center: CGPoint(x: (geometry.size.width - rectWidth) / 2 + cornerRadius,
-                                                y: (geometry.size.height - rectHeight) / 2 + cornerRadius),
-                                radius: cornerRadius,
-                                startAngle: .degrees(180),
-                                endAngle: .degrees(270),
-                                clockwise: false)
-                }
-                .stroke(strokeColor, lineWidth: strokeWidth)
-                
-                // Top Right Corner
-                Path { path in
-                    path.addArc(center: CGPoint(x: (geometry.size.width + rectWidth) / 2 - cornerRadius,
-                                                y: (geometry.size.height - rectHeight) / 2 + cornerRadius),
-                                radius: cornerRadius,
-                                startAngle: .degrees(270),
-                                endAngle: .degrees(360),
-                                clockwise: false)
-                }
-                .stroke(strokeColor, lineWidth: strokeWidth)
-                
-                // Bottom Left Corner
-                Path { path in
-                    path.addArc(center: CGPoint(x: (geometry.size.width - rectWidth) / 2 + cornerRadius,
-                                                y: (geometry.size.height + rectHeight) / 2 - cornerRadius),
-                                radius: cornerRadius,
-                                startAngle: .degrees(90),
-                                endAngle: .degrees(180),
-                                clockwise: false)
-                }
-                .stroke(strokeColor, lineWidth: strokeWidth)
-                
-                // Bottom Right Corner
-                Path { path in
-                    path.addArc(center: CGPoint(x: (geometry.size.width + rectWidth) / 2 - cornerRadius,
-                                                y: (geometry.size.height + rectHeight) / 2 - cornerRadius),
-                                radius: cornerRadius,
-                                startAngle: .degrees(0),
-                                endAngle: .degrees(90),
-                                clockwise: false)
-                }
-                .stroke(strokeColor, lineWidth: strokeWidth)
+                drawCornerPath(in: geometry, startAngle: 180, endAngle: 270, xOffset: -1, yOffset: -1)
+                drawCornerPath(in: geometry, startAngle: 270, endAngle: 360, xOffset: 1, yOffset: -1)
+                drawCornerPath(in: geometry, startAngle: 90, endAngle: 180, xOffset: -1, yOffset: 1)
+                drawCornerPath(in: geometry, startAngle: 0, endAngle: 90, xOffset: 1, yOffset: 1)
             }
         }
+    }
+    
+    private func drawCornerPath(in geometry: GeometryProxy, startAngle: Double, endAngle: Double, xOffset: CGFloat, yOffset: CGFloat) -> some View {
+        Path { path in
+            let centerX = (geometry.size.width + rectWidth * xOffset) / 2 - dsSizing.sizeMD * xOffset
+            let centerY = (geometry.size.height + rectHeight * yOffset) / 2 - dsSizing.sizeMD * yOffset
+            
+            path.addArc(
+                center: CGPoint(x: centerX, y: centerY),
+                radius: dsSizing.sizeMD,
+                startAngle: .degrees(startAngle),
+                endAngle: .degrees(endAngle),
+                clockwise: false
+            )
+        }
+        .stroke(strokeColor, lineWidth: strokeWidth)
     }
 }

@@ -12,7 +12,6 @@ struct BarcodeScannerView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         context.coordinator.setupCaptureSession(frameSize: frameSize, in: view)
-
         return view
     }
 
@@ -38,36 +37,33 @@ struct BarcodeScannerView: UIViewRepresentable {
             let captureSession = AVCaptureSession()
             self.captureSession = captureSession
 
-            guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else {
-                parent.logger.error("Failed to get the camera device")
+            guard let videoCaptureDevice = AVCaptureDevice.default(for: .video),
+                  let videoInput = try? AVCaptureDeviceInput(device: videoCaptureDevice) else {
+                parent.logger.error("Failed to initialize camera input")
+
                 return
             }
 
-            guard let videoInput = try? AVCaptureDeviceInput(device: videoCaptureDevice) else {
-                parent.logger.error("Failed to create video input")
+            guard captureSession.canAddInput(videoInput) else {
+                parent.logger.error("Cannot add video input to capture session")
+
                 return
             }
 
-            if captureSession.canAddInput(videoInput) {
-                captureSession.addInput(videoInput)
-            } else {
-                parent.logger.error("Cannot add video input to the capture session")
-                return
-            }
+            captureSession.addInput(videoInput)
 
             let metadataOutput = AVCaptureMetadataOutput()
             self.metadataOutput = metadataOutput
 
-            if captureSession.canAddOutput(metadataOutput) {
-                captureSession.addOutput(metadataOutput)
-                metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-                metadataOutput.metadataObjectTypes = [
-                    .ean8, .ean13, .pdf417, .qr, .code128, .code39
-                ]
-            } else {
-                parent.logger.error("Cannot add metadata output to the capture session")
+            guard captureSession.canAddOutput(metadataOutput) else {
+                parent.logger.error("Cannot add metadata output to capture session")
+
                 return
             }
+
+            captureSession.addOutput(metadataOutput)
+            metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+            metadataOutput.metadataObjectTypes = [.ean8, .ean13, .pdf417, .qr, .code128, .code39]
 
             let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
             previewLayer.frame = CGRect(origin: .zero, size: frameSize)
@@ -75,9 +71,12 @@ struct BarcodeScannerView: UIViewRepresentable {
             view.layer.addSublayer(previewLayer)
             self.previewLayer = previewLayer
 
-            // Start the capture session
+            startCaptureSession()
+        }
+
+        func startCaptureSession() {
             DispatchQueue.global(qos: .userInitiated).async {
-                captureSession.startRunning()
+                self.captureSession?.startRunning()
             }
         }
 
@@ -86,42 +85,30 @@ struct BarcodeScannerView: UIViewRepresentable {
 
             if shouldStartScanning {
                 if !captureSession.isRunning {
-                    DispatchQueue.global(qos: .userInitiated).async {
-                        captureSession.startRunning()
-                    }
+                    startCaptureSession()
                 }
-                // Re-enable metadata output
                 metadataOutput?.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             } else {
-                // Disable metadata output by setting the delegate to nil
-                metadataOutput?.setMetadataObjectsDelegate(nil, queue: nil)
+                stopCaptureSession()
             }
         }
 
-        func metadataOutput(
-            _ output: AVCaptureMetadataOutput,
-            didOutput metadataObjects: [AVMetadataObject],
-            from connection: AVCaptureConnection
-        ) {
-            guard
-                let metadataObject = metadataObjects.first,
-                let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject,
-                let stringValue = readableObject.stringValue
-            else {
-                return
+        func stopCaptureSession() {
+            DispatchQueue.global(qos: .userInitiated).async {
+                self.captureSession?.stopRunning()
             }
+        }
 
-            // Vibrate the device to provide feedback
+        func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+            guard let readableObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
+                  let stringValue = readableObject.stringValue else { return }
+
             AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
 
-            // Update the scanned code and scanning state on the main thread
             DispatchQueue.main.async {
                 self.parent.scannedCode = stringValue
-                self.parent.shouldStartScanning = false
+                self.parent.shouldStartScanning = true // Restart scanning after capture
             }
-
-            // Disable further scanning by setting the delegate to nil
-            metadataOutput?.setMetadataObjectsDelegate(nil, queue: nil)
         }
     }
 }

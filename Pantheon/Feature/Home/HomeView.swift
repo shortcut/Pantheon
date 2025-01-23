@@ -34,8 +34,8 @@ enum FullScreenCoverType: Identifiable {
 }
 
 struct HomeView: View {
-    @EnvironmentObject var receiptRepository: ReceiptRepository
-    
+    @EnvironmentObject fileprivate var receiptRepository: ReceiptRepository
+
     @Environment(\.designSystemFonts) fileprivate var dsFonts
     @Environment(\.designSystemColors) fileprivate var dsColors
     @Environment(\.designSystemIcons) fileprivate var dsIcons
@@ -87,27 +87,7 @@ struct HomeView: View {
         .sheet(item: $activeSheet, onDismiss: {
             selectedReceipt = nil
         }) { sheet in
-            switch sheet {
-            case .payment(let receipt):
-                if #available(iOS 16.0, *) {
-                    paymentSheet(for: receipt)
-                        .presentationDetents([.medium, .large])
-                        .presentationDragIndicator(.visible)
-                } else {
-                    paymentSheet(for: receipt)
-                }
-            case .transferToAccount:
-                TransferToAccountView()
-            case .transfertoTrip:
-                TransferToShoppingView()
-            case .scanSuccess(let receipt):
-                if #available(iOS 16.0, *) {
-                    BarcodeScanSuccessView(receipt: receipt)
-                        .presentationDetents([.medium])
-                } else {
-                    BarcodeScanSuccessView(receipt: receipt)
-                }
-            }
+            selectedReceiptSheetContent(sheet)
         }
         .fullScreenCover(item: $activeFullScreenCover) { cover in
             switch cover {
@@ -118,39 +98,82 @@ struct HomeView: View {
                 )
             }
         }
-        .onChange(of: scannedCode) { newValue in
-            guard newValue != nil else {
-                return
-            }
-            
-            receiptRepository.addRandomReceipt()
-            
-            guard let newReceipt = receiptRepository.receipts.first else {
-                return
-            }
-            
-            activeSheet = .scanSuccess(newReceipt)
-            scannedCode = nil
-            activeFullScreenCover = nil
+        .onChange(of: scannedCode) { _ in
+            handleScan()
         }
-        .onChange(of: selectedReceipt) { newValue in
-            if let receipt = newValue {
-                withAnimation {
-                    activeSheet = .payment(receipt)
-                }
-            }
+        .onChange(of: selectedReceipt) { receipt in
+            handleSelection(of: receipt)
         }
         .onChange(of: filteredState) { newValue in
             let newState = DepositReceipt.State(rawValue: newValue) ?? .normal
-            withAnimation {
-                receiptRepository.filter(by: newState)
-            }
+            updateFilter(with: newState)
+        }
+    }
+}
+
+//MARK: - Private methods
+private extension HomeView {
+
+    func handleScan() {
+        guard scannedCode != nil else {
+            return
+        }
+
+        receiptRepository.addRandomReceipt()
+
+        guard let newReceipt = receiptRepository.receipts.first else {
+            return
+        }
+
+        activeSheet = .scanSuccess(newReceipt)
+        scannedCode = nil
+        activeFullScreenCover = nil
+    }
+
+    func handleSelection(of receipt: DepositReceipt?) {
+        guard let receipt else {
+            return
+        }
+
+        withAnimation {
+            activeSheet = .payment(receipt)
+        }
+    }
+
+    func updateFilter(with state: DepositReceipt.State) {
+        withAnimation {
+            receiptRepository.filter(by: state)
         }
     }
 }
 
 // MARK: - Components
 private extension HomeView {
+
+    @ViewBuilder
+    func selectedReceiptSheetContent(_ sheet: SheetType) -> some View {
+        switch sheet {
+        case .payment(let receipt):
+            if #available(iOS 16.0, *) {
+                paymentSheet(for: receipt)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+            } else {
+                paymentSheet(for: receipt)
+            }
+        case .transferToAccount:
+            TransferToAccountView()
+        case .transfertoTrip:
+            TransferToShoppingView()
+        case .scanSuccess(let receipt):
+            if #available(iOS 16.0, *) {
+                BarcodeScanSuccessView(receipt: receipt)
+                    .presentationDetents([.medium])
+            } else {
+                BarcodeScanSuccessView(receipt: receipt)
+            }
+        }
+    }
 
     @ViewBuilder
     func paymentSheet(for receipt: DepositReceipt) -> some View {

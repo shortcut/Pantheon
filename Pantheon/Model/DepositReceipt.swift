@@ -16,16 +16,11 @@ struct DepositReceipt: Identifiable, Codable, Equatable {
             case .alreadyUsed: return "Brukte"
             }
         }
-        
+
         var tagTitle: String {
-            switch self {
-            case .normal: return ""
-            case .isNew: return "Ny"
-            case .expiresSoon: return "Utgår"
-            case .alreadyUsed: return "Brukt"
-            }
+            self == .normal ? "" : title
         }
-        
+
         func tagBackgroundColor(with dsColors: DesignSystemColorProtocol) -> DSColor {
             switch self {
             case .expiresSoon: return dsColors.surfaceNotificationDefault
@@ -35,7 +30,9 @@ struct DepositReceipt: Identifiable, Codable, Equatable {
             }
         }
 
-        var id: Int { self.rawValue }
+        var id: Int {
+            rawValue
+        }
     }
 
     let id: String
@@ -44,11 +41,11 @@ struct DepositReceipt: Identifiable, Codable, Equatable {
     let store: String
     var state: State = .normal
 
-    mutating func toggleState(_ state: State) {
-        self.state = state
+    mutating func toggleState(_ newState: State) {
+        state = newState
     }
 
-    static func ==(lhs: DepositReceipt, rhs: DepositReceipt) -> Bool {
+    static func == (lhs: DepositReceipt, rhs: DepositReceipt) -> Bool {
         lhs.id == rhs.id
     }
 }
