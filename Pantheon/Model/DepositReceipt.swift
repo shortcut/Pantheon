@@ -25,7 +25,7 @@ struct DepositReceipt: Identifiable, Codable, Equatable {
             switch self {
             case .expiresSoon: return dsColors.surfaceNotificationDefault
             case .isNew: return dsColors.surfaceSuccessSubtle
-            case .normal: return dsColors.textInvertedDefault
+            case .normal: return dsColors.surfacePrimary
             case .alreadyUsed: return dsColors.surfaceActionDefault
             }
         }

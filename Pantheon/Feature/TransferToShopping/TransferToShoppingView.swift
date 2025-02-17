@@ -1,4 +1,5 @@
 import SwiftUI
+import DesignSystem
 
 struct TransferToShoppingView: View {
     @Environment(\.dismiss) private var dismiss

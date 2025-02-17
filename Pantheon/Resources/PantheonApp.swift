@@ -3,7 +3,7 @@ import DesignSystem
 
 @main
 struct PantheonApp: App {
-    @State private var receiptRepository = ReceiptRepository()
+    @StateObject private var receiptRepository = ReceiptRepository()
     
     private let designSystem = DesignSystem.default
 

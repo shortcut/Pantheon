@@ -1,4 +1,5 @@
 import SwiftUI
+import DesignSystem
 
 struct BarcodeScanSuccessView: View {
     @Environment(\.dismiss) var dismiss
@@ -6,6 +7,8 @@ struct BarcodeScanSuccessView: View {
     @Environment(\.designSystemColors) private var dsColors
     @Environment(\.designSystemIllustrations) private var dsIllustrations
     @Environment(\.designSystemSpacing) private var dsSpacing
+
+    @EnvironmentObject fileprivate var receiptRepository: ReceiptRepository
 
     let receipt: DepositReceipt
 

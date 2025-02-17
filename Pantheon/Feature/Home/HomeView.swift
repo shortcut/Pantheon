@@ -4,7 +4,8 @@ import DesignSystem
 enum SheetType: Identifiable {
     case payment(DepositReceipt)
     case transferToAccount
-    case transfertoTrip
+    case transferToShopping
+    case transferToAssociation
     case scanSuccess(DepositReceipt)
 
 
@@ -14,8 +15,10 @@ enum SheetType: Identifiable {
             return "payment"
         case .transferToAccount:
             return "transferToAccount"
-        case .transfertoTrip:
-            return "transfertoTrip"
+        case .transferToShopping:
+            return "transferToTrip"
+        case .transferToAssociation:
+            return "transferToAssociation"
         case .scanSuccess:
             return "scanSuccess"
         }
@@ -41,10 +44,12 @@ struct HomeView: View {
     @Environment(\.designSystemIcons) fileprivate var dsIcons
     @Environment(\.designSystemSizing) fileprivate var dsSizing
     @Environment(\.designSystemSpacing) fileprivate var dsSpacing
+    @Environment(\.designSystemIllustrations) fileprivate var dsIllustrations
 
-    @State private var selectedReceipt: DepositReceipt?
+    @StateObject private var homeViewModel = HomeViewModel()
+
     @State private var scannedCode: String?
-    @State private var shouldStartScanning: Bool = true
+    @State private var shouldStartScanning: Bool = false
     @State private var filteredState: Int = 0
 
     @State private var activeSheet: SheetType?
@@ -54,8 +59,8 @@ struct HomeView: View {
         NavigationView {
             List {
                 ForEach(receiptRepository.filteredReceipts) { receipt in
-                    Button{
-                        selectedReceipt = receipt
+                    Button {
+                        homeViewModel.selectedReceipt = receipt
                     } label: {
                         ReceiptCell(receipt: receipt)
                     }
@@ -67,14 +72,17 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.large)
             .navigationTitle("Pantelapper")
             .toolbar(content: {
-                ToolbarItem(placement: .status) {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Spacer()
                     SegmentedControl(selection: $filteredState, options: DepositReceipt.State.allCases.map{$0.title})
+                    Spacer()
                 }
             })
             .toolbar(content: {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
                         activeFullScreenCover = .scanner
+                        shouldStartScanning = true
                     } label: {
                         Image(ds: dsIcons.utilityScannerBarCode)
                             .resizable()
@@ -85,7 +93,7 @@ struct HomeView: View {
         }
         .defaultStyles()
         .sheet(item: $activeSheet, onDismiss: {
-            selectedReceipt = nil
+            homeViewModel.selectedReceipt = nil
         }) { sheet in
             selectedReceiptSheetContent(sheet)
         }
@@ -101,7 +109,7 @@ struct HomeView: View {
         .onChange(of: scannedCode) { _ in
             handleScan()
         }
-        .onChange(of: selectedReceipt) { receipt in
+        .onChange(of: homeViewModel.selectedReceipt) { receipt in
             handleSelection(of: receipt)
         }
         .onChange(of: filteredState) { newValue in
@@ -163,8 +171,10 @@ private extension HomeView {
             }
         case .transferToAccount:
             TransferToAccountView()
-        case .transfertoTrip:
+        case .transferToShopping:
             TransferToShoppingView()
+        case .transferToAssociation:
+            TransferToAssociationView()
         case .scanSuccess(let receipt):
             if #available(iOS 16.0, *) {
                 BarcodeScanSuccessView(receipt: receipt)
@@ -182,55 +192,83 @@ private extension HomeView {
                 .font(.ds(dsFonts.header1Heading))
                 .foregroundStyle(dsColors.textDefault)
 
-            VStack(alignment: .leading) {
-                Button {
-                    activeSheet = .transferToAccount
-                } label: {
-                    HStack(spacing: dsSpacing.spaceMD) {
-                        Image("visa")
-                        VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
-                            Text("Overfør til konto")
-                                .font(.ds(dsFonts.header2Heading))
-                                .foregroundStyle(dsColors.textDefault)
-                            Text("Overfør \(amount: receipt.amount) til din konto")
-                                .font(.ds(dsFonts.caption))
-                                .foregroundStyle(dsColors.textSubtle)
+            ScrollView {
+                VStack(alignment: .leading) {
+                    Button {
+                        activeSheet = .transferToAccount
+                    } label: {
+                        HStack(spacing: dsSpacing.spaceMD) {
+                            Image("visa")
+                            VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
+                                Text("Overfør til konto")
+                                    .font(.ds(dsFonts.header2Heading))
+                                    .foregroundStyle(dsColors.textDefault)
+                                Text("Overfør \(amount: receipt.amount) til din konto")
+                                    .font(.ds(dsFonts.caption))
+                                    .foregroundStyle(dsColors.textSubtle)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: dsSizing.sizeSM)
+                                .foregroundStyle(dsColors.surfacePrimary)
+                        )
+                        .padding()
                     }
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: dsSizing.sizeSM)
-                            .foregroundStyle(dsColors.surfacePrimary)
-                    )
-                    .padding()
+
+                    Button {
+                        activeSheet = .transferToShopping
+                    } label: {
+                        HStack(spacing: dsSpacing.spaceMD) {
+                            Image("kasse")
+                            VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
+                                Text("Overfør til kasse")
+                                    .font(.ds(dsFonts.header2Heading))
+                                    .foregroundStyle(dsColors.textDefault)
+                                Text("Overfør \(amount: receipt.amount) til din neste handel")
+                                    .font(.ds(dsFonts.caption))
+                                    .foregroundStyle(dsColors.textSubtle)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: dsSizing.sizeSM)
+                                .foregroundStyle(dsColors.surfacePrimary)
+                        )
+                        .padding()
+                    }
+
+                    Button {
+                        activeSheet = .transferToAssociation
+                    } label: {
+                        HStack(spacing: dsSpacing.spaceMD) {
+                            Image(ds: dsIllustrations.hjerteHender)
+                                .resizable()
+                                .frame(width: 48, height: 48)
+
+                            VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
+                                Text("Overfør til lag/forening")
+                                    .font(.ds(dsFonts.header2Heading))
+                                    .foregroundStyle(dsColors.textDefault)
+                                Text("Overfør \(amount: receipt.amount) til laget/foreningen")
+                                    .font(.ds(dsFonts.caption))
+                                    .foregroundStyle(dsColors.textSubtle)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: dsSizing.sizeSM)
+                                .foregroundStyle(dsColors.surfacePrimary)
+                        )
+                        .padding()
+                    }
                 }
 
-                Button {
-                    activeSheet = .transfertoTrip
-                } label: {
-                    HStack(spacing: dsSpacing.spaceMD) {
-                        Image("kasse")
-                        VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
-                            Text("Overfør til kasse")
-                                .font(.ds(dsFonts.header2Heading))
-                                .foregroundStyle(dsColors.textDefault)
-                            Text("Overfør \(amount: receipt.amount) til din neste handel")
-                                .font(.ds(dsFonts.caption))
-                                .foregroundStyle(dsColors.textSubtle)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: dsSizing.sizeSM)
-                            .foregroundStyle(dsColors.surfacePrimary)
-                    )
-                    .padding()
-                }
+                Spacer()
             }
-
-            Spacer()
         }
         .padding(.top, dsSpacing.spaceXL)
         .padding()

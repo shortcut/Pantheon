@@ -1,0 +1,24 @@
+{
+  "originHash" : "5ade764b00eb0fe1f96ed1b31e66a08a54d5024cf8142dbfb66dc2203e5ce282",
+  "pins" : [
+    {
+      "identity" : "rema-1000-designsystem-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/shortcut-nda/Rema-1000-DesignSystem-iOS.git",
+      "state" : {
+        "revision" : "8c6ad7053f51b0fe6e4eadee9e6e01c74c17c4d4",
+        "version" : "1.0.26"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "41982a3656a71c768319979febd796c6fd111d5c",
+        "version" : "1.5.0"
+      }
+    }
+  ],
+  "version" : 3
+}

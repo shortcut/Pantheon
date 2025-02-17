@@ -38,10 +38,10 @@ extension ReceiptRepository {
 private extension ReceiptRepository {
     func generateRandomReceipts() -> [DepositReceipt] {
         let storeNames = [
-            "REMA Torggata", "REMA Storo", "REMA Grunerløkka",
-            "REMA Sinsen", "REMA Majorstuen", "REMA Løren",
-            "REMA Grønland", "REMA Bislett", "REMA Skøyen",
-            "REMA Nydalen"
+            "REMA 1000 Torggata", "REMA 1000 Storo", "REMA 1000 Grunerløkka",
+            "REMA 1000 Sinsen", "REMA 1000 Majorstuen", "REMA 1000 Løren",
+            "REMA 1000 Grønland", "REMA 1000 Bislett", "REMA 1000 Skøyen",
+            "REMA 1000 Nydalen"
         ]
 
         var mockReceipts: [DepositReceipt] = []
