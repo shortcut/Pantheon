@@ -48,8 +48,6 @@ struct HomeView: View {
 
     @StateObject private var homeViewModel = HomeViewModel()
 
-    @State private var scannedCode: String?
-    @State private var shouldStartScanning: Bool = false
     @State private var filteredState: Int = 0
 
     @State private var activeSheet: SheetType?
@@ -82,7 +80,7 @@ struct HomeView: View {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
                         activeFullScreenCover = .scanner
-                        shouldStartScanning = true
+                        homeViewModel.shouldStartScanning = true
                     } label: {
                         Image(ds: dsIcons.utilityScannerBarCode)
                             .resizable()
@@ -101,12 +99,12 @@ struct HomeView: View {
             switch cover {
             case .scanner:
                 ScannerView(
-                    scannedCode: $scannedCode,
-                    shouldStartScanning: $shouldStartScanning
+                    scannedCode: $homeViewModel.scannedCode,
+                    shouldStartScanning: $homeViewModel.shouldStartScanning
                 )
             }
         }
-        .onChange(of: scannedCode) { _ in
+        .onChange(of: homeViewModel.scannedCode) { _ in
             handleScan()
         }
         .onChange(of: homeViewModel.selectedReceipt) { receipt in
@@ -123,7 +121,7 @@ struct HomeView: View {
 private extension HomeView {
 
     func handleScan() {
-        guard scannedCode != nil else {
+        guard homeViewModel.scannedCode != nil else {
             return
         }
 
@@ -134,7 +132,7 @@ private extension HomeView {
         }
 
         activeSheet = .scanSuccess(newReceipt)
-        scannedCode = nil
+        homeViewModel.scannedCode = nil
         activeFullScreenCover = nil
     }
 
