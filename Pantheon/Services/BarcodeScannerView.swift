@@ -107,6 +107,7 @@ struct BarcodeScannerView: UIViewRepresentable {
 
             DispatchQueue.main.async {
                 self.parent.scannedCode = stringValue
+                self.stopCaptureSession()
                 self.parent.shouldStartScanning = false
             }
         }
