@@ -119,7 +119,7 @@ private extension HomeView {
             return
         }
 
-        receiptRepository.addRandomReceipt()
+        receiptRepository.addReceipt()
 
         guard let newReceipt = receiptRepository.receipts.first else {
             return
