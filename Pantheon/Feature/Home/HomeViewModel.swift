@@ -12,4 +12,9 @@ class HomeViewModel: ObservableObject {
 
     @Published var scannedCode: String?
     @Published var shouldStartScanning: Bool = false
+
+    @Published var filteredState: Int = 0
+
+    @Published var activeSheet: SheetType?
+    @Published var activeFullScreenCover: FullScreenCoverType?
 }

@@ -48,11 +48,6 @@ struct HomeView: View {
 
     @StateObject private var homeViewModel = HomeViewModel()
 
-    @State private var filteredState: Int = 0
-
-    @State private var activeSheet: SheetType?
-    @State private var activeFullScreenCover: FullScreenCoverType?
-
     var body: some View {
         NavigationView {
             List {
@@ -72,14 +67,14 @@ struct HomeView: View {
             .toolbar(content: {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Spacer()
-                    SegmentedControl(selection: $filteredState, options: DepositReceipt.State.allCases.map{$0.title})
+                    SegmentedControl(selection: $homeViewModel.filteredState, options: DepositReceipt.State.allCases.map{$0.title})
                     Spacer()
                 }
             })
             .toolbar(content: {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
-                        activeFullScreenCover = .scanner
+                        homeViewModel.activeFullScreenCover = .scanner
                         homeViewModel.shouldStartScanning = true
                     } label: {
                         Image(ds: dsIcons.utilityScannerBarCode)
@@ -90,12 +85,12 @@ struct HomeView: View {
             })
         }
         .defaultStyles()
-        .sheet(item: $activeSheet, onDismiss: {
+        .sheet(item: $homeViewModel.activeSheet, onDismiss: {
             homeViewModel.selectedReceipt = nil
         }) { sheet in
             selectedReceiptSheetContent(sheet)
         }
-        .fullScreenCover(item: $activeFullScreenCover) { cover in
+        .fullScreenCover(item: $homeViewModel.activeFullScreenCover) { cover in
             switch cover {
             case .scanner:
                 ScannerView(
@@ -110,7 +105,7 @@ struct HomeView: View {
         .onChange(of: homeViewModel.selectedReceipt) { receipt in
             handleSelection(of: receipt)
         }
-        .onChange(of: filteredState) { newValue in
+        .onChange(of: homeViewModel.filteredState) { newValue in
             let newState = DepositReceipt.State(rawValue: newValue) ?? .normal
             updateFilter(with: newState)
         }
@@ -119,7 +114,6 @@ struct HomeView: View {
 
 //MARK: - Private methods
 private extension HomeView {
-
     func handleScan() {
         guard homeViewModel.scannedCode != nil else {
             return
@@ -131,9 +125,9 @@ private extension HomeView {
             return
         }
 
-        activeSheet = .scanSuccess(newReceipt)
+        homeViewModel.activeSheet = .scanSuccess(newReceipt)
         homeViewModel.scannedCode = nil
-        activeFullScreenCover = nil
+        homeViewModel.activeFullScreenCover = nil
     }
 
     func handleSelection(of receipt: DepositReceipt?) {
@@ -142,7 +136,7 @@ private extension HomeView {
         }
 
         withAnimation {
-            activeSheet = .payment(receipt)
+            homeViewModel.activeSheet = .payment(receipt)
         }
     }
 
@@ -155,7 +149,6 @@ private extension HomeView {
 
 // MARK: - Components
 private extension HomeView {
-
     @ViewBuilder
     func selectedReceiptSheetContent(_ sheet: SheetType) -> some View {
         switch sheet {
@@ -193,7 +186,7 @@ private extension HomeView {
             ScrollView {
                 VStack(alignment: .leading) {
                     Button {
-                        activeSheet = .transferToAccount
+                        homeViewModel.activeSheet = .transferToAccount
                     } label: {
                         HStack(spacing: dsSpacing.spaceMD) {
                             Image("visa")
@@ -216,7 +209,7 @@ private extension HomeView {
                     }
 
                     Button {
-                        activeSheet = .transferToShopping
+                        homeViewModel.activeSheet = .transferToShopping
                     } label: {
                         HStack(spacing: dsSpacing.spaceMD) {
                             Image("kasse")
@@ -239,7 +232,7 @@ private extension HomeView {
                     }
 
                     Button {
-                        activeSheet = .transferToAssociation
+                        homeViewModel.activeSheet = .transferToAssociation
                     } label: {
                         HStack(spacing: dsSpacing.spaceMD) {
                             Image(ds: dsIllustrations.hjerteHender)
