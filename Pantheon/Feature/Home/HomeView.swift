@@ -186,7 +186,13 @@ private extension HomeView {
             ScrollView {
                 VStack(alignment: .leading) {
                     Button {
-                        homeViewModel.activeSheet = .transferToAccount
+                        // This is needed to prevent a bouncing loop on iOS 15
+                        DispatchQueue.main.async {
+                            homeViewModel.activeSheet = nil
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                homeViewModel.activeSheet = .transferToAccount
+                            }
+                        }
                     } label: {
                         HStack(spacing: dsSpacing.spaceMD) {
                             Image("visa")
@@ -209,7 +215,13 @@ private extension HomeView {
                     }
 
                     Button {
-                        homeViewModel.activeSheet = .transferToShopping
+                        // This is needed to prevent a bouncing loop on iOS 15
+                        DispatchQueue.main.async {
+                            homeViewModel.activeSheet = nil
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                homeViewModel.activeSheet = .transferToShopping
+                            }
+                        }
                     } label: {
                         HStack(spacing: dsSpacing.spaceMD) {
                             Image("kasse")
@@ -232,7 +244,13 @@ private extension HomeView {
                     }
 
                     Button {
-                        homeViewModel.activeSheet = .transferToAssociation
+                        // This is needed to prevent a bouncing loop on iOS 15
+                        DispatchQueue.main.async {
+                            homeViewModel.activeSheet = nil
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                homeViewModel.activeSheet = .transferToAssociation
+                            }
+                        }
                     } label: {
                         HStack(spacing: dsSpacing.spaceMD) {
                             Image(ds: dsIllustrations.hjerteHender)

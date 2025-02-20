@@ -65,4 +65,5 @@ struct TransferToShoppingView: View {
 
 #Preview {
     TransferToShoppingView()
+        .environmentObject(ReceiptRepository())
 }
