@@ -96,4 +96,5 @@ private extension TransferToAssociationView {
 
 #Preview {
     TransferToAssociationView()
+        .environmentObject(ReceiptRepository())
 }

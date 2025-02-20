@@ -100,4 +100,5 @@ struct TransferToAccountView: View {
 
 #Preview {
     TransferToAccountView()
+        .environmentObject(ReceiptRepository())
 }
