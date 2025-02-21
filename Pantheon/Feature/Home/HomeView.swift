@@ -6,6 +6,7 @@ enum SheetType: Identifiable {
     case transferToAccount
     case transferToShopping
     case transferToAssociation
+    case confirmTransferToAssociation
     case scanSuccess(DepositReceipt)
 
 
@@ -19,6 +20,8 @@ enum SheetType: Identifiable {
             return "transferToTrip"
         case .transferToAssociation:
             return "transferToAssociation"
+        case .confirmTransferToAssociation:
+            return "confirmTransferToAssociation"
         case .scanSuccess:
             return "scanSuccess"
         }
@@ -165,7 +168,9 @@ private extension HomeView {
         case .transferToShopping:
             TransferToShoppingView()
         case .transferToAssociation:
-            TransferToAssociationView()
+            TransferToAssociationView(activeSheet: $homeViewModel.activeSheet)
+        case .confirmTransferToAssociation:
+            ConfirmTransferToAssociationView(activeSheet: $homeViewModel.activeSheet)
         case .scanSuccess(let receipt):
             if #available(iOS 16.0, *) {
                 BarcodeScanSuccessView(receipt: receipt)

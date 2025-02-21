@@ -11,6 +11,9 @@ import DesignSystem
 struct TransferToAssociationView: View {
     @Environment(\.designSystemFonts) fileprivate var dsFonts
     @Environment(\.designSystemColors) fileprivate var dsColors
+    @Environment(\.designSystemSpacing) private var dsSpacing
+
+    @Binding var activeSheet: SheetType?
 
     let associations: [String: [String]] = [
         "Frivillige organisasjoner": ["Røde kors", "Plan"],
@@ -18,26 +21,38 @@ struct TransferToAssociationView: View {
         "Idrettslag": ["Oslo Golfklubb", "Asker hockey"]
     ]
 
-    init() {
-        if #available(iOS 16, *) {
-            // Handle it where the background is set
-        } else {
-            // Removes background color for prior iOS 15
-            UITableView.appearance().backgroundColor = UIColor.clear
-        }
-    }
-
     var body: some View {
-        VStack {
-            Text("Velg lag eller forening")
-                .padding(.vertical)
-                .font(.ds(dsFonts.header2Heading))
-                .foregroundStyle(dsColors.textDefault)
-
-            platformAdaptiveView()  
+        NavigationView {
+            VStack {
+                platformAdaptiveView()  
+            }
+            .background(dsColors.surfaceDefaultMain)
+            .toolbar(content: {
+                ToolbarItem(placement: .principal) {
+                    Text("Velg lag eller forening")
+                        .font(.ds(dsFonts.header2Heading))
+                        .foregroundStyle(Color(ds: dsColors.textActionDefault))
+                        .padding(.top, dsSpacing.spaceLG)
+                }
+            })
+            .toolbar(content: {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button("Avbryt") {
+                        activeSheet = nil
+                    }
+                    .foregroundStyle(Color(ds: dsColors.textActionDefault))
+                    .padding(.top, dsSpacing.spaceLG)
+                }
+            })
         }
-        .background(dsColors.surfaceDefaultMain)
-        .edgesIgnoringSafeArea(.all)
+        .onAppear {
+            if #available(iOS 16, *) {
+                // Handle it where the background is set
+            } else {
+                // Removes background color for prior iOS 15
+                UITableView.appearance().backgroundColor = UIColor.clear
+            }
+        }
     }
 }
 
@@ -51,7 +66,12 @@ private extension TransferToAssociationView {
                     Section {
                         ForEach(associations[category] ?? ["Fant ikke lag"], id: \.self) { item in
                             Button {
-
+                                DispatchQueue.main.async {
+                                    activeSheet = nil
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        activeSheet = .confirmTransferToAssociation
+                                    }
+                                }
                             } label: {
                                 Text(item)
                                     .font(.ds(dsFonts.header2Heading))
@@ -74,7 +94,12 @@ private extension TransferToAssociationView {
                     Section {
                         ForEach(associations[category] ?? ["Fant ikke lag"], id: \.self) { item in
                             Button {
-
+                                DispatchQueue.main.async {
+                                    activeSheet = nil
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        activeSheet = .confirmTransferToAssociation
+                                    }
+                                }
                             } label: {
                                 Text(item)
                                     .font(.ds(dsFonts.header2Heading))
@@ -95,6 +120,6 @@ private extension TransferToAssociationView {
 }
 
 #Preview {
-    TransferToAssociationView()
+    TransferToAssociationView(activeSheet: .constant(.transferToAssociation))
         .environmentObject(ReceiptRepository())
 }

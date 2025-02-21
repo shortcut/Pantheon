@@ -35,16 +35,6 @@ struct TransferToShoppingView: View {
             Spacer()
         }
         .background(dsColors.surfaceSubtle1)
-        .safeAreaInset(edge: .bottom) {
-            Button {
-                dismiss()
-            } label: {
-                Text("Ferdig")
-            }
-            .buttonStyle(.actionButtonPrimary)
-            .actionButtonIsExpandingWidth(true)
-            .padding(dsSpacing.spaceLG)
-        }
         .overlay(alignment: .topTrailing) {
             closeButton()
         }
@@ -56,7 +46,7 @@ struct TransferToShoppingView: View {
         } label: {
             Image(ds: dsIcons.actionsClose)
                 .resizable()
-                .foregroundStyle(dsColors.textDefault)
+                .foregroundStyle(dsColors.textActionDefault)
                 .frame(width: dsSizing.size2XL, height: dsSizing.size2XL)
         }
         .padding()

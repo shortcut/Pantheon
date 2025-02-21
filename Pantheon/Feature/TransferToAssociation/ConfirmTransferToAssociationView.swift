@@ -1,9 +1,13 @@
+//
+//  ConfirmTranferToAssociationView.swift
+//  Pantheon
+//
+//  Created by Kjetil Haug Terjesen on 20/02/2025.
+//
 
 import SwiftUI
-import DesignSystem
 
-struct TransferToAccountView: View {
-    @Environment(\.dismiss) private var dismiss
+struct ConfirmTransferToAssociationView: View {
     @Environment(\.designSystemFonts) private var dsFonts
     @Environment(\.designSystemColors) private var dsColors
     @Environment(\.designSystemIcons) private var dsIcons
@@ -11,6 +15,8 @@ struct TransferToAccountView: View {
     @Environment(\.designSystemSpacing) private var dsSpacing
 
     @EnvironmentObject var repository: ReceiptRepository
+
+    @Binding var activeSheet: SheetType?
 
     var body: some View {
         let receipt = repository.receipts[0]
@@ -40,24 +46,29 @@ struct TransferToAccountView: View {
                 .padding(.top, dsSpacing.spaceXL)
 
                 HStack(spacing: dsSpacing.spaceMD) {
-                    Image(.sbanken)
+                    Image(.plan)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: dsSizing.sizeXL, height: dsSizing.sizeXL)
 
                     VStack(alignment: .leading, spacing: dsSpacing.space2XS) {
-                        Text("Sbanken ASA")
-                            .font(.ds(dsFonts.bodySmall))
-                            .foregroundStyle(Color(ds: dsColors.textActionDefault))
+                        HStack {
+                            Text("Plan")
+                                .font(.ds(dsFonts.buttonLarge))
+                                .foregroundStyle(Color(ds: dsColors.textActionDefault))
 
-                        Text("Kort som ender med 1234")
-                            .font(.ds(dsFonts.caption))
-                            .foregroundStyle(Color(ds: dsColors.textSubtle))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                            Spacer()
+                        }
                     }
 
                     Button {
-                        // Action to change account
+                        // Action to change association
+                        DispatchQueue.main.async {
+                            activeSheet = nil
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                activeSheet = .transferToAssociation
+                            }
+                        }
                     } label: {
                         Text("Endre")
                             .font(.ds(dsFonts.buttonSmall))
@@ -80,7 +91,7 @@ struct TransferToAccountView: View {
             .padding(.horizontal, dsSpacing.spaceLG)
             .safeAreaInset(edge: .bottom) {
                 Button {
-                    dismiss()
+                    activeSheet = nil
                 } label: {
                     Text("Bekreft")
                 }
@@ -99,7 +110,12 @@ struct TransferToAccountView: View {
             .toolbar(content: {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button("Avbryt") {
-                        dismiss()
+                        DispatchQueue.main.async {
+                            activeSheet = nil
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                activeSheet = .transferToAssociation
+                            }
+                        }
                     }
                     .foregroundStyle(Color(ds: dsColors.textActionDefault))
                     .padding(.top, dsSpacing.spaceLG)
@@ -109,8 +125,7 @@ struct TransferToAccountView: View {
     }
 }
 
-
 #Preview {
-    TransferToAccountView()
+    ConfirmTransferToAssociationView(activeSheet: .constant(.confirmTransferToAssociation))
         .environmentObject(ReceiptRepository())
 }
