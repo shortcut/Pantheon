@@ -36,16 +36,19 @@ struct ReceiptCell: View {
                 .font(.ds(dsFonts.bodySmall))
                 .foregroundStyle(dsColors.textSubtle)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityLabel("\(receipt.date.formattedDate()) klokken \(receipt.date.formattedTime()) ")
         }
     }
 
     private func receiptAccessory() -> some View {
         VStack(alignment: .trailing, spacing: dsSpacing.space2XS) {
             receiptStatusTag()
+                .padding(.bottom, 10)
 
             Text("\(amount: receipt.amount)")
                 .font(.ds(dsFonts.bodyMedium))
                 .foregroundStyle(dsColors.textDefault)
+                .accessibilityLabel(receipt.amount.currencyText())
         }
     }
 

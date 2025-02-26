@@ -31,12 +31,15 @@ struct TransferToShoppingView: View {
                     .fill(Color(ds: dsColors.surfacePrimary))
             )
             .padding(dsSpacing.spaceLG)
+            .accessibilityElement(children: .combine)
+            .accessibilitySortPriority(1)
 
             Spacer()
         }
         .background(dsColors.surfaceSubtle1)
         .overlay(alignment: .topTrailing) {
             closeButton()
+                .accessibilitySortPriority(0)
         }
     }
 
@@ -50,6 +53,8 @@ struct TransferToShoppingView: View {
                 .frame(width: dsSizing.size2XL, height: dsSizing.size2XL)
         }
         .padding()
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel("Lukk")
     }
 }
 

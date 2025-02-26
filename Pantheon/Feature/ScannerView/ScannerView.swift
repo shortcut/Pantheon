@@ -16,7 +16,7 @@ struct ScannerView: View {
             barcodeScannerView()
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("Skanner område")
-                .accessibilityHint("Pek kameraet mot pantemaskinens strekkode.")
+                .accessibilityHint("Pek kameraet mot pantemaskinens QR kode.")
                 .accessibilitySortPriority(2)
 
             VStack {
