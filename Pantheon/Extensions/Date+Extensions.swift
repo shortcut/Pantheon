@@ -18,3 +18,18 @@ extension Date {
         return startDate.addingTimeInterval(randomTimeInterval)
     }
 }
+
+// For accessibility
+extension Date {
+    func formattedDate() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE d. MMMM"
+        return formatter.string(from: self)
+    }
+
+    func formattedTime() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: self)
+    }
+}

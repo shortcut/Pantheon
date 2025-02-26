@@ -84,6 +84,8 @@ struct HomeView: View {
                             .resizable()
                             .frame(width: dsSizing.size2XL, height: dsSizing.size2XL)
                     }
+                    .accessibilityLabel("QR kode skanner.")
+                    .accessibilityHint("Dobbeltrykk for å åpne skanneren.")
                 }
             })
         }
@@ -187,6 +189,7 @@ private extension HomeView {
             Text("Hva vil du gjøre med pengene?")
                 .font(.ds(dsFonts.header1Heading))
                 .foregroundStyle(dsColors.textDefault)
+                .accessibilityAddTraits(.isHeader)
 
             ScrollView {
                 VStack(alignment: .leading) {

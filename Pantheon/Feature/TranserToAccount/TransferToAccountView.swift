@@ -38,6 +38,7 @@ struct TransferToAccountView: View {
                         .shadow(color: Color(ds: dsColors.borderDividerDefault).opacity(0.4), radius: 10)
                 }
                 .padding(.top, dsSpacing.spaceXL)
+                .accessibilityElement(children: .combine)
 
                 HStack(spacing: dsSpacing.spaceMD) {
                     Image(.sbanken)
@@ -74,6 +75,7 @@ struct TransferToAccountView: View {
                         )
                         .shadow(color: Color(ds: dsColors.borderDividerDefault).opacity(0.4), radius: 10)
                 }
+                .accessibilityElement(children: .combine) // Need to fix the button click when action on button is added
 
                 Spacer()
             }
