@@ -73,9 +73,20 @@ private extension TransferToAssociationView {
                                     }
                                 }
                             } label: {
-                                Text(item)
-                                    .font(.ds(dsFonts.header2Heading))
-                                    .foregroundStyle(dsColors.textDefault)
+                                HStack {
+                                    Image(item.description.lowercased())
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    
+                                    Text(item)
+                                        .font(.ds(dsFonts.header2Heading))
+                                        .foregroundStyle(dsColors.textDefault)
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .foregroundStyle(dsColors.surfaceStrong)
+                                }
                             }
                         }
                     } header: {
