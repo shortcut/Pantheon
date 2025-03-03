@@ -14,6 +14,7 @@ struct TransferToAssociationView: View {
     @Environment(\.designSystemSpacing) private var dsSpacing
 
     @Binding var activeSheet: SheetType?
+    @Binding var associationName: String
 
     let associations: [String: [String]] = [
         "Frivillige organisasjoner": ["Røde kors", "Plan"],
@@ -69,6 +70,7 @@ private extension TransferToAssociationView {
                                 DispatchQueue.main.async {
                                     activeSheet = nil
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        associationName = item
                                         activeSheet = .confirmTransferToAssociation
                                     }
                                 }
@@ -108,6 +110,7 @@ private extension TransferToAssociationView {
                                 DispatchQueue.main.async {
                                     activeSheet = nil
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        associationName = item
                                         activeSheet = .confirmTransferToAssociation
                                     }
                                 }
@@ -131,6 +134,6 @@ private extension TransferToAssociationView {
 }
 
 #Preview {
-    TransferToAssociationView(activeSheet: .constant(.transferToAssociation))
+    TransferToAssociationView(activeSheet: .constant(.transferToAssociation), associationName: .constant("Plan"))
         .environmentObject(ReceiptRepository())
 }

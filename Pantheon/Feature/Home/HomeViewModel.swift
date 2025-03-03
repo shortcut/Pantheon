@@ -17,4 +17,8 @@ class HomeViewModel: ObservableObject {
 
     @Published var activeSheet: SheetType?
     @Published var activeFullScreenCover: FullScreenCoverType?
+
+    @Published var depositAmount: Double = 0.0
+
+    @Published var assosioationName: String = ""
 }

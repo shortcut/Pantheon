@@ -17,6 +17,8 @@ struct ConfirmTransferToAssociationView: View {
     @EnvironmentObject var repository: ReceiptRepository
 
     @Binding var activeSheet: SheetType?
+    @Binding var depositAmount: Double
+    @Binding var assosioationName: String
 
     var body: some View {
         let receipt = repository.receipts[0]
@@ -28,7 +30,7 @@ struct ConfirmTransferToAssociationView: View {
                         .font(.ds(dsFonts.bodySmall))
                         .foregroundStyle(Color(ds: dsColors.textSubtle))
 
-                    Text("\(amount: receipt.amount)")
+                    Text("\(amount: depositAmount)")
                         .font(.ds(dsFonts.header1DisplayLarge))
                         .foregroundStyle(Color(ds: dsColors.textStrong))
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -46,14 +48,14 @@ struct ConfirmTransferToAssociationView: View {
                 .padding(.top, dsSpacing.spaceXL)
 
                 HStack(spacing: dsSpacing.spaceMD) {
-                    Image(.plan)
+                    Image(assosioationName.description.lowercased())
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: dsSizing.sizeXL, height: dsSizing.sizeXL)
 
                     VStack(alignment: .leading, spacing: dsSpacing.space2XS) {
                         HStack {
-                            Text("Plan")
+                            Text(assosioationName)
                                 .font(.ds(dsFonts.buttonLarge))
                                 .foregroundStyle(Color(ds: dsColors.textActionDefault))
 
@@ -126,6 +128,6 @@ struct ConfirmTransferToAssociationView: View {
 }
 
 #Preview {
-    ConfirmTransferToAssociationView(activeSheet: .constant(.confirmTransferToAssociation))
+    ConfirmTransferToAssociationView(activeSheet: .constant(.confirmTransferToAssociation), depositAmount: .constant(37.50), assosioationName: .constant("Plan"))
         .environmentObject(ReceiptRepository())
 }
