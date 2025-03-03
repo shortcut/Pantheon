@@ -194,10 +194,7 @@ private extension HomeView {
             ScrollView {
                 VStack(alignment: .leading) {
                     Button {
-                        print("amount: \(receipt.amount)")
-                        print("depositAmount: \(homeViewModel.depositAmount)")
                         homeViewModel.depositAmount = receipt.amount
-                        print("depositAmount2: \(homeViewModel.depositAmount)")
                         // This is needed to prevent a bouncing loop on iOS 15
                         DispatchQueue.main.async {
                             homeViewModel.activeSheet = nil
@@ -227,10 +224,7 @@ private extension HomeView {
                     }
 
                     Button {
-                        print("amount: \(receipt.amount)")
-                        print("depositAmount: \(homeViewModel.depositAmount)")
                         homeViewModel.depositAmount = receipt.amount
-                        print("depositAmount2: \(homeViewModel.depositAmount)")
                         // This is needed to prevent a bouncing loop on iOS 15
                         DispatchQueue.main.async {
                             homeViewModel.activeSheet = nil
@@ -260,10 +254,7 @@ private extension HomeView {
                     }
 
                     Button {
-                        print("amount: \(receipt.amount)")
-                        print("depositAmount: \(homeViewModel.depositAmount)")
                         homeViewModel.depositAmount = receipt.amount
-                        print("depositAmount2: \(homeViewModel.depositAmount)")
                         // This is needed to prevent a bouncing loop on iOS 15
                         DispatchQueue.main.async {
                             homeViewModel.activeSheet = nil
