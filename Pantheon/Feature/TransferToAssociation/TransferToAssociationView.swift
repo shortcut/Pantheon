@@ -8,6 +8,9 @@
 import SwiftUI
 import DesignSystem
 
+/// TransferToAssociationView to choose which organisation to tranfer the money to.
+/// This list will be different from store to store.
+/// This is base on what was said in a meeting with the backend
 struct TransferToAssociationView: View {
     @Environment(\.designSystemFonts) fileprivate var dsFonts
     @Environment(\.designSystemColors) fileprivate var dsColors
@@ -59,6 +62,8 @@ struct TransferToAssociationView: View {
 
 // MARK: - Components
 private extension TransferToAssociationView {
+    // This iOS version check is needed to remove backround and set custom background,
+    //because iOS 15 dont support .scrollContentBackground(.hidden)
     @ViewBuilder
     func platformAdaptiveView() -> some View {
         if #available(iOS 16, *) {

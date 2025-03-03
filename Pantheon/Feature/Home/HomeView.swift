@@ -1,6 +1,7 @@
 import SwiftUI
 import DesignSystem
 
+/// SheetType enum for use when navigating sheets
 enum SheetType: Identifiable {
     case payment(DepositReceipt)
     case transferToAccount
@@ -28,6 +29,7 @@ enum SheetType: Identifiable {
     }
 }
 
+/// FullScreenCoverType enum to make sure the scanner use full screen. Might be used for other things later
 enum FullScreenCoverType: Identifiable {
     case scanner
 
@@ -39,6 +41,7 @@ enum FullScreenCoverType: Identifiable {
     }
 }
 
+/// HomeView, the landing page, also holds the navigation of sheets
 struct HomeView: View {
     @EnvironmentObject fileprivate var receiptRepository: ReceiptRepository
 
@@ -119,6 +122,7 @@ struct HomeView: View {
 
 //MARK: - Private methods
 private extension HomeView {
+    // Handle scan, adding receipt (mock random receipt for now), and recets the scanner.
     func handleScan() {
         guard homeViewModel.scannedCode != nil else {
             return
@@ -154,6 +158,7 @@ private extension HomeView {
 
 // MARK: - Components
 private extension HomeView {
+    // Handle which sheet is displayed
     @ViewBuilder
     func selectedReceiptSheetContent(_ sheet: SheetType) -> some View {
         switch sheet {
@@ -183,6 +188,7 @@ private extension HomeView {
         }
     }
 
+    /// View code for the payment sheet
     @ViewBuilder
     func paymentSheet(for receipt: DepositReceipt) -> some View {
         VStack(spacing: dsSpacing.spaceXL) {
@@ -195,6 +201,7 @@ private extension HomeView {
                 VStack(alignment: .leading) {
                     Button {
                         homeViewModel.depositAmount = receipt.amount
+
                         // This is needed to prevent a bouncing loop on iOS 15
                         DispatchQueue.main.async {
                             homeViewModel.activeSheet = nil
@@ -225,6 +232,7 @@ private extension HomeView {
 
                     Button {
                         homeViewModel.depositAmount = receipt.amount
+
                         // This is needed to prevent a bouncing loop on iOS 15
                         DispatchQueue.main.async {
                             homeViewModel.activeSheet = nil
@@ -255,6 +263,7 @@ private extension HomeView {
 
                     Button {
                         homeViewModel.depositAmount = receipt.amount
+
                         // This is needed to prevent a bouncing loop on iOS 15
                         DispatchQueue.main.async {
                             homeViewModel.activeSheet = nil
