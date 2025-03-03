@@ -166,13 +166,13 @@ private extension HomeView {
                 paymentSheet(for: receipt)
             }
         case .transferToAccount:
-            TransferToAccountView()
+            TransferToAccountView(depositAmount: $homeViewModel.depositAmount)
         case .transferToShopping:
-            TransferToShoppingView()
+            TransferToShoppingView(depositAmount: $homeViewModel.depositAmount)
         case .transferToAssociation:
-            TransferToAssociationView(activeSheet: $homeViewModel.activeSheet)
+            TransferToAssociationView(activeSheet: $homeViewModel.activeSheet, associationName: $homeViewModel.assosioationName)
         case .confirmTransferToAssociation:
-            ConfirmTransferToAssociationView(activeSheet: $homeViewModel.activeSheet)
+            ConfirmTransferToAssociationView(activeSheet: $homeViewModel.activeSheet, depositAmount: $homeViewModel.depositAmount, assosioationName: $homeViewModel.assosioationName)
         case .scanSuccess(let receipt):
             if #available(iOS 16.0, *) {
                 BarcodeScanSuccessView(receipt: receipt)
@@ -194,6 +194,7 @@ private extension HomeView {
             ScrollView {
                 VStack(alignment: .leading) {
                     Button {
+                        homeViewModel.depositAmount = receipt.amount
                         // This is needed to prevent a bouncing loop on iOS 15
                         DispatchQueue.main.async {
                             homeViewModel.activeSheet = nil
@@ -223,6 +224,7 @@ private extension HomeView {
                     }
 
                     Button {
+                        homeViewModel.depositAmount = receipt.amount
                         // This is needed to prevent a bouncing loop on iOS 15
                         DispatchQueue.main.async {
                             homeViewModel.activeSheet = nil
@@ -252,6 +254,7 @@ private extension HomeView {
                     }
 
                     Button {
+                        homeViewModel.depositAmount = receipt.amount
                         // This is needed to prevent a bouncing loop on iOS 15
                         DispatchQueue.main.async {
                             homeViewModel.activeSheet = nil
@@ -291,4 +294,9 @@ private extension HomeView {
         .padding()
         .background(dsColors.surfaceSubtle1)
     }
+}
+
+#Preview {
+    HomeView()
+        .environmentObject(ReceiptRepository())
 }

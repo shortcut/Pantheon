@@ -9,6 +9,8 @@ struct TransferToShoppingView: View {
     @Environment(\.designSystemSizing) private var dsSizing
     @Environment(\.designSystemSpacing) private var dsSpacing
 
+    @Binding var depositAmount: Double
+
     var body: some View {
         VStack {
             Spacer()
@@ -59,6 +61,6 @@ struct TransferToShoppingView: View {
 }
 
 #Preview {
-    TransferToShoppingView()
+    TransferToShoppingView(depositAmount: .constant(37.50))
         .environmentObject(ReceiptRepository())
 }

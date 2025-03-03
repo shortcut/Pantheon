@@ -14,6 +14,7 @@ struct TransferToAssociationView: View {
     @Environment(\.designSystemSpacing) private var dsSpacing
 
     @Binding var activeSheet: SheetType?
+    @Binding var associationName: String
 
     let associations: [String: [String]] = [
         "Frivillige organisasjoner": ["Røde kors", "Plan"],
@@ -69,13 +70,25 @@ private extension TransferToAssociationView {
                                 DispatchQueue.main.async {
                                     activeSheet = nil
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        associationName = item
                                         activeSheet = .confirmTransferToAssociation
                                     }
                                 }
                             } label: {
-                                Text(item)
-                                    .font(.ds(dsFonts.header2Heading))
-                                    .foregroundStyle(dsColors.textDefault)
+                                HStack {
+                                    Image(item.description.lowercased())
+                                        .resizable()
+                                        .frame(width: 20, height: 20)
+                                    
+                                    Text(item)
+                                        .font(.ds(dsFonts.header2Heading))
+                                        .foregroundStyle(dsColors.textDefault)
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .foregroundStyle(dsColors.surfaceStrong)
+                                }
                             }
                         }
                     } header: {
@@ -97,6 +110,7 @@ private extension TransferToAssociationView {
                                 DispatchQueue.main.async {
                                     activeSheet = nil
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        associationName = item
                                         activeSheet = .confirmTransferToAssociation
                                     }
                                 }
@@ -120,6 +134,6 @@ private extension TransferToAssociationView {
 }
 
 #Preview {
-    TransferToAssociationView(activeSheet: .constant(.transferToAssociation))
+    TransferToAssociationView(activeSheet: .constant(.transferToAssociation), associationName: .constant("Plan"))
         .environmentObject(ReceiptRepository())
 }

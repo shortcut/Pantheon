@@ -12,6 +12,8 @@ struct TransferToAccountView: View {
 
     @EnvironmentObject var repository: ReceiptRepository
 
+    @Binding var depositAmount: Double
+
     var body: some View {
         let receipt = repository.receipts[0]
 
@@ -22,7 +24,7 @@ struct TransferToAccountView: View {
                         .font(.ds(dsFonts.bodySmall))
                         .foregroundStyle(Color(ds: dsColors.textSubtle))
 
-                    Text("\(amount: receipt.amount)")
+                    Text("\(amount: depositAmount)")
                         .font(.ds(dsFonts.header1DisplayLarge))
                         .foregroundStyle(Color(ds: dsColors.textStrong))
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -113,6 +115,6 @@ struct TransferToAccountView: View {
 
 
 #Preview {
-    TransferToAccountView()
+    TransferToAccountView(depositAmount: .constant(37.50))
         .environmentObject(ReceiptRepository())
 }
