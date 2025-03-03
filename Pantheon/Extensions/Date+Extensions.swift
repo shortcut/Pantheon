@@ -19,7 +19,7 @@ extension Date {
     }
 }
 
-// For accessibility
+/// For accessibility
 extension Date {
     func formattedDate() -> String {
         let formatter = DateFormatter()

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// ConfirmTransferToAssociationView is the confirm view when tranfer the money to association/organisations
 struct ConfirmTransferToAssociationView: View {
     @Environment(\.designSystemFonts) private var dsFonts
     @Environment(\.designSystemColors) private var dsColors

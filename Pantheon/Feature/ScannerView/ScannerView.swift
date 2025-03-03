@@ -1,6 +1,7 @@
 import SwiftUI
 import DesignSystem
 
+/// ScannerView for scanning QR code
 struct ScannerView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.designSystemIcons) fileprivate var dsIcons
@@ -89,6 +90,7 @@ struct RoundedRectangleStroke: View {
 }
 
 // I'll keeep this code in case the design will change to something like this:
+// e.g like the scanner in scan and pay. Now it looks more like the scanner for scan store
 // MARK: - For the View
 //            overlayMask() // It's not used in the qr scanner for select store
 //                    CornerStrokeOverlay( // Should this be used so it is similar to the scanner in scann and pay or use the rectangle as in scann qr code to select store?

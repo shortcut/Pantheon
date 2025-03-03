@@ -7,6 +7,8 @@
 
 import Foundation
 
+/// HomeViewModel for homeView. Holds also acticeSheet,
+/// depositAmount and assosioatoinName that is sent to some other views and viewModel. Might consider to extract them to a more globel class later
 class HomeViewModel: ObservableObject {
     @Published var selectedReceipt: DepositReceipt?
 

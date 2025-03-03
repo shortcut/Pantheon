@@ -2,6 +2,7 @@
 import SwiftUI
 import DesignSystem
 
+/// TransferToAccountView, the final view when tranfering to you account
 struct TransferToAccountView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.designSystemFonts) private var dsFonts

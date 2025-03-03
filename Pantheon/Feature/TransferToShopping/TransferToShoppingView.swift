@@ -1,6 +1,7 @@
 import SwiftUI
 import DesignSystem
 
+/// TransferToShoppingView, the barcode view to use when scanning you barcode at the checkout
 struct TransferToShoppingView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.designSystemFonts) private var dsFonts

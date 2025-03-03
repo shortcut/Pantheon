@@ -1,6 +1,7 @@
 import SwiftUI
 import DesignSystem
 
+/// BarcodeScanSuccessView, summarizes the values of scanning
 struct BarcodeScanSuccessView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.designSystemFonts) private var dsFonts
