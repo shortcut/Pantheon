@@ -164,11 +164,15 @@ private extension HomeView {
         switch sheet {
         case .payment(let receipt):
             if #available(iOS 16.0, *) {
-                paymentSheet(for: receipt)
+                PaymentView(receipt: receipt,
+                            depositAmount: $homeViewModel.depositAmount,
+                            activeSheet: $homeViewModel.activeSheet)
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
             } else {
-                paymentSheet(for: receipt)
+                PaymentView(receipt: receipt,
+                            depositAmount: $homeViewModel.depositAmount,
+                            activeSheet: $homeViewModel.activeSheet)
             }
         case .transferToAccount:
             TransferToAccountView(depositAmount: $homeViewModel.depositAmount)
@@ -186,122 +190,6 @@ private extension HomeView {
                 BarcodeScanSuccessView(receipt: receipt)
             }
         }
-    }
-
-    /// View code for the payment sheet
-    @ViewBuilder
-    func paymentSheet(for receipt: DepositReceipt) -> some View {
-        VStack(spacing: dsSpacing.spaceXL) {
-            Text("Hva vil du gjøre med pengene?")
-                .font(.ds(dsFonts.header1Heading))
-                .foregroundStyle(dsColors.textDefault)
-                .accessibilityAddTraits(.isHeader)
-
-            ScrollView {
-                VStack(alignment: .leading) {
-                    Button {
-                        homeViewModel.depositAmount = receipt.amount
-
-                        // This is needed to prevent a bouncing loop on iOS 15
-                        DispatchQueue.main.async {
-                            homeViewModel.activeSheet = nil
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                homeViewModel.activeSheet = .transferToAccount
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: dsSpacing.spaceMD) {
-                            Image("visa")
-                            VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
-                                Text("Overfør til konto")
-                                    .font(.ds(dsFonts.header2Heading))
-                                    .foregroundStyle(dsColors.textDefault)
-                                Text("Overfør \(amount: receipt.amount) til din konto")
-                                    .font(.ds(dsFonts.caption))
-                                    .foregroundStyle(dsColors.textSubtle)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: dsSizing.sizeSM)
-                                .foregroundStyle(dsColors.surfacePrimary)
-                        )
-                        .padding()
-                    }
-
-                    Button {
-                        homeViewModel.depositAmount = receipt.amount
-
-                        // This is needed to prevent a bouncing loop on iOS 15
-                        DispatchQueue.main.async {
-                            homeViewModel.activeSheet = nil
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                homeViewModel.activeSheet = .transferToShopping
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: dsSpacing.spaceMD) {
-                            Image("kasse")
-                            VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
-                                Text("Overfør til kasse")
-                                    .font(.ds(dsFonts.header2Heading))
-                                    .foregroundStyle(dsColors.textDefault)
-                                Text("Overfør \(amount: receipt.amount) til din neste handel")
-                                    .font(.ds(dsFonts.caption))
-                                    .foregroundStyle(dsColors.textSubtle)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: dsSizing.sizeSM)
-                                .foregroundStyle(dsColors.surfacePrimary)
-                        )
-                        .padding()
-                    }
-
-                    Button {
-                        homeViewModel.depositAmount = receipt.amount
-
-                        // This is needed to prevent a bouncing loop on iOS 15
-                        DispatchQueue.main.async {
-                            homeViewModel.activeSheet = nil
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                homeViewModel.activeSheet = .transferToAssociation
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: dsSpacing.spaceMD) {
-                            Image(ds: dsIllustrations.hjerteHender)
-                                .resizable()
-                                .frame(width: 48, height: 48)
-
-                            VStack(alignment: .leading, spacing: dsSpacing.spaceXS) {
-                                Text("Overfør til lag/forening")
-                                    .font(.ds(dsFonts.header2Heading))
-                                    .foregroundStyle(dsColors.textDefault)
-                                Text("Overfør \(amount: receipt.amount) til laget/foreningen")
-                                    .font(.ds(dsFonts.caption))
-                                    .foregroundStyle(dsColors.textSubtle)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: dsSizing.sizeSM)
-                                .foregroundStyle(dsColors.surfacePrimary)
-                        )
-                        .padding()
-                    }
-                }
-
-                Spacer()
-            }
-        }
-        .padding(.top, dsSpacing.spaceXL)
-        .padding()
-        .background(dsColors.surfaceSubtle1)
     }
 }
 
