@@ -1,5 +1,5 @@
 # Pantheon  
-**Short Description:**
+**Short Description:**  
 Pantheon is a project from Rema that will give the customer the opportunity to scan a QR code on the bottle deposit machine with there phone, and get the deposit receipt in the app. From there the customer can choose if they want to deposit the money to ther account, use a ean code and scan it at the checkout or deposit it to a association/organization.  
 
 ## About the project  
